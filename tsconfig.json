@@ -1,19 +1,16 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    // "declaration": true,
-    "module": "es2015",
+    "declaration": true,
+    "module": "ES2015",
     "moduleResolution": "node",
     "newLine": "LF",
     "outDir": "dist",
     "sourceMap": true,
     "strict": true,
-    "target": "es5"
+    "target": "ES2018"
   },
   "include": [
     "src/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
 }

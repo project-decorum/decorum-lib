@@ -15,12 +15,15 @@ module.exports = {
   module: {
     exprContextCritical: false, // Mocha will complain otherwise
     rules: [
-      { test: /\.ts$/, loader: 'awesome-typescript-loader' },
+      { test: /\.ts$/, loader: 'awesome-typescript-loader', options: { silent: true } },
       { test: /\.css$/, use: [ 'style-loader', 'css-loader' ] },
     ]
   },
   resolve: {
     extensions: ['.ts', '.js']
+  },
+  devServer: {
+    stats: "minimal",
   },
   node: {
     fs: 'empty', // Mocha will complain otherwise
