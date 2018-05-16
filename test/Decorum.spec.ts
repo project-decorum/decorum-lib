@@ -5,11 +5,11 @@ import Decorum from '../src/Decorum';
 describe('Decorum', () => {
   let decorum: Decorum;
 
-  it('initialises the object', async () => {
+  it('initialise', async () => {
     decorum = await Decorum.initialise();
   });
 
-  it('logs in', async () => {
+  it('logging in', async () => {
     await decorum.login();
   });
 });
