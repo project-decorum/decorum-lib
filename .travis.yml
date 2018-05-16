@@ -6,7 +6,7 @@ install:
   - export NODE_ENV=dev
   - npm install
 
-after_success:
+after_script:
   - npm run report
   - './node_modules/.bin/codecov'
 
