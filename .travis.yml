@@ -12,7 +12,7 @@ install:
   - npm install
 
 after_script:
-  - npm run report && './node_modules/.bin/codecov'
+  - './node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && ./node_modules/.bin/codecov'
 
 before_deploy:
   - npm run docs

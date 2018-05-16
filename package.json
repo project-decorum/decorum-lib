@@ -12,8 +12,7 @@
   "scripts": {
     "docs": "typedoc src",
     "pretest": "tsc",
-    "test": "cross-env NODE_ENV=dev nyc mocha dist/test",
-    "report": "nyc report --reporter=text-lcov > coverage/coverage.lcov"
+    "test": "cross-env NODE_ENV=dev nyc mocha dist/test"
   },
   "devDependencies": {
     "@types/chai": "^4.1.3",
