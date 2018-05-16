@@ -13,5 +13,20 @@
   "include": [
     "src/**/*",
     "test/**/*"
-  ]
+  ],
+  "typedocOptions": {
+    "out": "docs",
+    "entryPoint": "Decorum",
+    "mode": "file",
+    "target": "ES6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "ignoreCompilerErrors": true,
+    "excludePrivate": true,
+    "excludeNotExported": true,
+    "stripInternal": true,
+    "suppressExcessPropertyErrors": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "readme": "none"
+  }
 }

@@ -5,3 +5,13 @@ node_js:
 install:
   - export NODE_ENV=dev
   - npm install
+
+before_deploy:
+  - npm run docs
+deploy:
+  - provider: pages
+    skip-cleanup: true
+    local_dir: docs/
+    github-token: $GITHUB_TOKEN
+    on:
+      branch: gh-pages
