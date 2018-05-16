@@ -13,7 +13,7 @@
     "docs": "typedoc src",
     "pretest": "tsc",
     "test": "cross-env NODE_ENV=dev nyc mocha dist/test",
-    "report": "nyc report --reporter=lcovonly"
+    "report": "nyc report --reporter=text-lcov > coverage/coverage.lcov"
   },
   "devDependencies": {
     "@types/chai": "^4.1.3",

@@ -7,8 +7,7 @@ install:
   - npm install
 
 after_script:
-  - npm run report
-  - './node_modules/.bin/codecov'
+  - npm run report && './node_modules/.bin/codecov'
 
 before_deploy:
   - npm run docs
