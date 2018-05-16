@@ -2,6 +2,11 @@ sudo: true
 language: node_js
 node_js:
   - '8'
+
+cache:
+  directories:
+    - node_modules
+
 install:
   - export NODE_ENV=dev
   - npm install
