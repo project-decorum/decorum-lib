@@ -34,5 +34,10 @@
   },
   "files": [
     "dist/src"
-  ]
+  ],
+  "nyc": {
+    "exclude": [
+      "dist/test"
+    ]
+  }
 }
