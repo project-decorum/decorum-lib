@@ -1,4 +1,4 @@
-import { App } from 'safe-wrapper';
+import * as Safe from '@maidsafe/safe-node-app';
 
 const info = {
   id: 'decorum.lib',
@@ -9,44 +9,48 @@ const info = {
 export default class Decorum {
   /**
    * Initialise the Decorum object.
+   *
+   * @returns {Decorum}
    */
   public static async initialise() {
-    const connection = await App.initialise(info);
+    const app = await Safe.initializeApp(info);
 
-    return new this(connection);
+    return new this(app);
   }
 
   // The underlying app handle object.
-  public connection: App;
+  public app: any;
 
   /**
    * Construct the Decorum object.
    *
-   * @param connection  An app instance.
+   * @param app  An app instance.
    */
-  constructor(connection: App) {
-    this.connection = connection;
+  constructor(app: any) {
+    this.app = app;
   }
 
+  /* istanbul ignore next */
   /**
-   * Request authorisation from the user.
+   * Request authorisation from the user
    *
-   * @return authorisation URI
+   * @return {string} authorisation URI
    */
   public async authorise() {
-    return await this.connection.authorise();
+    return await this.app.auth.genAuthUri();
   }
 
   /**
-   * Connect a registered session with the network.
+   * Login
    *
-   * @param authUri
+   * @return {Decorum}
    */
-  public async connect(authUri: string | false = false) {
-    if (authUri !== false) {
-      await this.connection.connectAuthorised(authUri);
+  public async login(authUri?: string) {
+    /* istanbul ignore if */
+    if (authUri !== undefined) {
+      await this.app.auth.loginFromURI(authUri);
     } else {
-      await this.connection.connect();
+      await this.app.auth.loginForTest();
     }
 
     return this;
