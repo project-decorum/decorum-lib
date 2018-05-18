@@ -10,8 +10,9 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "docs": "typedoc src",
-    "pretest": "tsc",
+    "pretest": "npm run build",
     "test": "cross-env NODE_ENV=dev nyc mocha dist/test"
   },
   "devDependencies": {
