@@ -1,5 +1,5 @@
 {
-  "name": "decorum-lib",
+  "name": "@project-decorum/decorum-lib",
   "version": "0.1.0",
   "description": "Decorum Library",
   "author": "Benno Zeeman <bzeeman@live.nl>",
