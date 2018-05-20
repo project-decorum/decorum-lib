@@ -6,6 +6,12 @@ const info = {
   vendor: 'Project Decorum',
 };
 
+const permissions = {};
+
+const opts = {
+  own_container: true,
+};
+
 export default class Decorum {
   /**
    * Initialise the Decorum object.
@@ -37,7 +43,7 @@ export default class Decorum {
    * @return {string} authorisation URI
    */
   public async authorise() {
-    return await this.app.auth.genAuthUri();
+    return await this.app.auth.genAuthUri(permissions, opts);
   }
 
   /**
@@ -50,7 +56,7 @@ export default class Decorum {
     if (authUri !== undefined) {
       await this.app.auth.loginFromURI(authUri);
     } else {
-      await this.app.auth.loginForTest();
+      await this.app.auth.loginForTest(permissions, opts);
     }
 
     return this;
