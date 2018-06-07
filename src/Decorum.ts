@@ -12,6 +12,10 @@ const opts = {
   own_container: true,
 };
 
+const TYPES = {
+  IDENTITY: 5487,
+};
+
 export default class Decorum {
   /**
    * Initialise the Decorum object.
@@ -60,5 +64,20 @@ export default class Decorum {
     }
 
     return this;
+  }
+
+  /**
+   * Create new identity.
+   *
+   * @param nickname
+   */
+  public async createIdentity(nickname: string) {
+    const entries = await this.app.mutableData.newEntries();
+    await entries.insert('nickname', nickname);
+
+    const md = await this.app.mutableData.newRandomPublic(TYPES.IDENTITY);
+    await md.put(Safe.CONSTANTS.MD_PERMISSION_EMPTY, entries);
+
+    return md;
   }
 }
