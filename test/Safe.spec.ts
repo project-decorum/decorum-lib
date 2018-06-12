@@ -1,17 +1,20 @@
+import { assert } from 'chai';
 import Safe from '../src/Safe';
 import * as path from 'path';
 import * as process from 'process';
 
-setTimeout(() => null, 10000);
+setTimeout(() => null, 20000); // Prevent Node.js from exiting
 
 describe('Safe', function() {
   this.timeout(0);
 
+  const rand = Math.random().toString(36).substr(2, 4);
+
   it('first identity', async () => {
     const info = {
-      id: 'decorum.lib',
-      name: 'Decorum Core Library',
-      vendor: 'Project Decorum',
+      id: rand,
+      name: rand,
+      vendor: rand,
     };
 
     const permissions = {};
@@ -25,8 +28,6 @@ describe('Safe', function() {
       path.join(process.cwd(), 'dist/test/bootstrap.js'),
     ]);
 
-    console.log(await app.getOwnContainerName());
-
     const md = await app.auth.getOwnContainer();
     const entries = await md.getEntries();
     const mutation = await entries.mutate();
@@ -34,29 +35,30 @@ describe('Safe', function() {
     await md.applyEntriesMutation(mutation);
   });
 
-  // it('access identity from app', async () => {
-  //   const info = {
-  //     id: 'random.app',
-  //     name: 'Random',
-  //     vendor: 'Random Inc.',
-  //   };
+  it('access identity from app', async () => {
+    const info = {
+      id: 'random.' + rand,
+      name: 'Random ' + rand,
+      vendor: 'Random Inc. ' + rand,
+    };
 
-  //   const app = await Safe.initializeApp(info);
+    const permissions = {
+      ['apps/' + rand]: ['Read'],
+    };
 
-  //   const permissions = {
-  //     'apps/decorum.lib': ['Read'],
-  //   };
+    const opts = {
+      own_container: false,
+    };
 
-  //   const opts = {
-  //     own_container: false,
-  //   };
+    const app = await Safe.bootstrap(info, permissions, opts, [
+      process.argv[0],
+      path.join(process.cwd(), 'dist/test/bootstrap.js'),
+    ]);
 
-  //   await app.auth.loginForTest(permissions, opts);
+    const md = await app.auth.getContainer('apps/' + rand);
+    const key = await md.encryptKey('identity-1');
+    const value = await md.decrypt((await md.get(key)).buf);
 
-  //   const md = await app.auth.getContainer('apps/decorum.lib');
-  //   const key = await md.encryptKey('identity-1');
-  //   const value = await md.decryptValue(await md.get(key));
-
-  //   assert(value, 'myvalue');
-  // });
+    assert(value, 'myvalue');
+  });
 });
