@@ -13,7 +13,8 @@
     "build": "tsc",
     "docs": "typedoc src",
     "pretest": "npm run build",
-    "test": "cross-env NODE_ENV=dev nyc mocha dist/test"
+    "test": "cross-env NODE_ENV=dev nyc mocha dist/test/index.js",
+    "test:auth": "npm run pretest && cross-env NODE_ENV=dev nyc mocha dist/test/index-auth.js"
   },
   "devDependencies": {
     "@types/chai": "^4.1.3",
