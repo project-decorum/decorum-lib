@@ -8,7 +8,7 @@ import * as Safe from '@maidsafe/safe-node-app';
 ipc.config.silent = true;
 
 
-Safe.bootstrap = async (info: any) => {
+Safe.bootstrap = async (info: any, permissions: any = {}, opts: any = {}, execPath?: string[]) => {
   const options = {
     libPath: get_lib_path(),
   };
@@ -37,7 +37,7 @@ Safe.bootstrap = async (info: any) => {
   if (argv.uri !== undefined) {
     uri = argv.uri;
   } else {
-    await authorise(process.pid, info, options);
+    await authorise(process.pid, info, options, permissions, opts, execPath);
     uri = await ipcReceive(String(process.pid));
   }
 
@@ -46,15 +46,25 @@ Safe.bootstrap = async (info: any) => {
 
 export default Safe;
 
-async function authorise(pid: number, info: any, options: any) {
+async function authorise(
+  pid: number,
+  info: any,
+  options: any,
+  permissions: any = {},
+  opts: any = {},
+  execPath?: string[]) {
+  if (execPath === undefined) {
+    execPath = [process.argv[0], process.argv[1]];
+  }
+
   info.customExecPath = [
-    process.argv[0], process.argv[1],
+    ...execPath,
     '--pid', String(pid),
     '--uri',
   ];
 
   const app = await Safe.initializeApp(info, null, options);
-  const uri = await app.auth.genAuthUri({});
+  const uri = await app.auth.genAuthUri(permissions, opts);
 
   await app.auth.openUri(uri.uri);
 }
@@ -100,6 +110,10 @@ function get_lib_path() {
 
   const locations = [
     'node_modules/@maidsafe/safe-node-app/src/native',
+    '../node_modules/@maidsafe/safe-node-app/src/native',
+    '../../node_modules/@maidsafe/safe-node-app/src/native',
+    '../../../node_modules/@maidsafe/safe-node-app/src/native',
+    '../../../../node_modules/@maidsafe/safe-node-app/src/native',
   ];
 
   for (const root of roots) {
