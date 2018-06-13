@@ -3,6 +3,9 @@
 This project uses [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Method to create identity MD
+- Tests for bootstrap authentication
 
 
 ## [0.1.0] - 2018-05-20
