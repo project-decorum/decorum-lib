@@ -7,8 +7,8 @@
   "homepage": "https://github.com/project-decorum/decorum-lib#readme",
   "bugs": "https://github.com/project-decorum/decorum-lib/issues",
   "license": "MIT",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "docs": "typedoc src",
@@ -37,7 +37,7 @@
     "yargs": "^11.1.0"
   },
   "files": [
-    "dist/src"
+    "dist"
   ],
   "nyc": {
     "extension": [

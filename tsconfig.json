@@ -11,8 +11,7 @@
     "target": "ES2017"
   },
   "include": [
-    "src/**/*",
-    "test/**/*"
+    "src/**/*"
   ],
   "typedocOptions": {
     "out": "docs",
