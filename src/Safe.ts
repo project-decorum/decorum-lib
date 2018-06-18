@@ -8,7 +8,7 @@ import * as Safe from '@maidsafe/safe-node-app';
 ipc.config.silent = true;
 
 
-Safe.bootstrap = async (info: any, permissions: any = {}, opts: any = {}, execPath?: string[]) => {
+(Safe as any).bootstrap = async (info: any, permissions: any = {}, opts: any = {}, execPath?: string[]) => {
   const options = {
     libPath: get_lib_path(),
   };
