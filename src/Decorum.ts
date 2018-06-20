@@ -1,4 +1,5 @@
 import * as Safe from '@maidsafe/safe-node-app';
+import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 
 const info = {
   id: 'decorum.lib',
@@ -29,7 +30,7 @@ export default class Decorum {
   }
 
   // The underlying app handle object.
-  public app: any;
+  public app: SAFEApp;
 
   /**
    * Construct the Decorum object.

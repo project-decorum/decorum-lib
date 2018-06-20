@@ -737,7 +737,8 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
 
     /**
      * Create a new mutuable data at a random address with public access.
-     * @param typeTag - the typeTag to use
+     *
+     * @param typeTag the typeTag to use
      */
     newRandomPublic(typeTag: number): Promise<MutableData>;
 
