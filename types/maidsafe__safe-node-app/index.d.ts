@@ -269,6 +269,15 @@ declare module '@maidsafe/safe-node-app/src/app' {
     appInfo: AppInfo;
 
     /**
+     * Generate the log path for the provided filename. If the filename provided
+     * is null, it then returns the path of where the safe_core log file is
+     * located.
+     *
+     * @param logFilename optional log filename to generate the path
+     */
+    logPath(logFilename?: string): Promise<String>;
+
+    /**
      * Returns account information, e.g. number of mutations done and available.
      */
     getAccountInfo(): Promise<AccountInfo>;
@@ -818,6 +827,17 @@ declare module '@maidsafe/safe-node-app/src/api/auth' {
     genShareMDataUri(permissions: any): string;
 
     /**
+     * Generate an unregistered connection URI for the app.
+     * @returns `{id: <id>, uri: 'safe-auth://' }`
+     */
+    genConnUri(): { id: any, uri: string };
+
+    /**
+     * Open the given Authentication URI to the authenticator
+     */
+    openUri(uri: string): string;
+
+    /**
      * Generate a `'safe-auth'`-URI to request further container permissions
      *
      * @param containers mapping container name to list of permissions
@@ -1067,6 +1087,11 @@ declare module '@maidsafe/safe-node-app/src/api/crypto' {
     constructor(app: SAFEApp);
 
     /**
+     * Hash the given input with SHA3 Hash
+     */
+    sha3Hash(data: any): Promise<Buffer>;
+
+    /**
      * Get the public signing key of this session
      */
     getAppPubSignKey(): Promise<PubSignKey>;
@@ -1122,6 +1147,13 @@ declare module '@maidsafe/safe-node-app/src/api/crypto' {
      * @param raw secret encryption key raw bytes as string
      */
     secEncKeyFromRaw(raw: string): Promise<SecEncKey>;
+
+    /**
+     * Generate a nonce that can be used when creating private MutableData
+     *
+     * @returns the nonce generated
+     */
+    generateNonce(): Promise<Buffer>;
   }
 
 }
