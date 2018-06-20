@@ -634,7 +634,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      *
      * @returns the entry value and its current version
      */
-    get(): Promise<ValueVersion>;
+    get(key: any): Promise<ValueVersion>;
 
     /**
      * Commit this MutableData to the network.
