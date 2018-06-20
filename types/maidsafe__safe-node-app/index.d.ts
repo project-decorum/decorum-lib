@@ -3,220 +3,150 @@ declare module '@maidsafe/safe-node-app' {
 }
 
 /**
- * The AuthInterface contains all authentication related
- * functionality with the network. Like creating an authenticated
- * or unauthenticated connection or create messages for the IPC
- * authentitcation protocol.
+ * The AuthInterface contains all authentication related functionality with the
+ * network. Like creating an authenticated or unauthenticated connection or
+ * create messages for the IPC authentitcation protocol.
  *
- * Access your instance through ypur {SAFEApp} instance under `.auth`.
+ * Access your instance through your {SAFEApp} instance under `.auth`.
  */
 declare class AuthInterface {
-  /**
-   * The AuthInterface contains all authentication related
-   * functionality with the network. Like creating an authenticated
-   * or unauthenticated connection or create messages for the IPC
-   * authentitcation protocol.
-   *
-   * Access your instance through ypur {SAFEApp} instance under `.auth`.
-   */
   constructor(app: SAFEApp, initialisation: InitOptions);
 
   /**
    * Whether or not this is a registered/authenticated session.
    *
-   * @returns {Boolean} true if this is an authenticated session
+   * @returns true if this is an authenticated session
    */
-  registered: any;
+  registered: boolean;
 
   /**
-   * Generate an authentication URI for the app with
-   * the given permissions and optional parameters.
+   * Generate an authentication URI for the app with the given permissions and optional parameters.
    *
-   * @param {Object} permissions - mapping the container-names
-   *                  to a list of permissions you want to
-   *                  request
-   * @param {Object=} opts - optional parameters
-   * @param {Boolean} [opts.own_container=false] - whether or not to request
-   *    our own container to be created for us, too
-   *
-   * @returns {Object} `{id: <id>, uri: 'safe-auth://' }`
-   * @example // using an Authentication example:
-   * app.auth.genAuthUri({
-   *  _public: ['Insert'], // request to insert into public
-   *  _other: ['Insert', 'Update'] // request to insert and update
-   * }, {own_container: true}) // and we want our own container, too
+   * @param permissions mapping the container-names to a list of permissions you want to request
+   * @param opts optional parameters: own_container: whether or not to request our own container to be created for us, too
+   * @returns `{id: <id>, uri: 'safe-auth://' }`
    */
-  genAuthUri(permissions: Object, opts?: { own_container: Boolean }): Object;
+  genAuthUri(permissions: any, opts?: { own_container: boolean }): { id: string, uri: string };
 
   /**
-   * Generate a `'safe-auth'`-URI to request permissions
-   * on arbitrary owned MutableData's.
+   * Generate a `'safe-auth'`-URI to request permissions on arbitrary owned MutableData's.
    *
-   * @param {Object} permissions - mapping the MutableData's XoR names
-   *                  to a list of permissions you want to request
-   *
-   * @returns {String} `safe-auth://`-URI
-   * @example // example of requesting permissions for a couple of MutableData's:
-   * app.auth.genShareMDataUri([
-   *  { typeTag: 15001,   // request for MD with tag 15001
-   *    name: 'XoRname1',  // request for MD located at address 'XoRname1'
-   *    perms: ['Insert'], // request for inserting into the referenced MD
-   *  },
-   *  { typeTag: 15020,   // request for MD with tag 15020
-   *    name: 'XoRname2',  // request for MD located at address 'XoRname2'
-   *    perms: ['Insert', `Update`], // request for updating and inserting into the referenced MD
-   *  }
-   * ])
+   * @param permissions mapping the MutableData's XoR names to a list of permissions you want to request
+   * @returns `safe-auth://`-URI
    */
-  genShareMDataUri(permissions: Object): String;
+  genShareMDataUri(permissions: any): string;
 
   /**
    * Generate a `'safe-auth'`-URI to request further container permissions
    *
-   * @example // generating a container authorisation URI:
-   * app.auth.genContainerAuthUri(
-   *  _publicNames: ['Insert'], // request to insert into publicNames
-   * })
-   * @returns {String}
-   * @arg {Object} containers mapping container name to list of permissions
+   * @param containers mapping container name to list of permissions
    */
-  genContainerAuthUri(containers: Object): String;
+  genContainerAuthUri(containers: any): string;
 
   /**
-   * Refresh the access persmissions from the network. Useful when you just
-   * connected or received a response from the authenticator in the IPC protocol.
-   * @return {Promise}
+   * Refresh the access persmissions from the network. Useful when you just connected or received a response from the authenticator in the IPC protocol.
    */
   refreshContainersPermissions(): Promise<void>;
 
   /**
-   * Get the names of all containers found and the app's granted
-   * permissions for each of them.
-   *
-   * @return {Promise<Array>}
+   * Get the names of all containers found and the app's granted permissions for each of them.
    */
   getContainersPermissions(): Promise<Array<any>>;
 
   /**
-   * Read granted containers permissions from an auth URI
-   * without the need to connect to the network.
-   * @arg {String} uri the IPC response string given
+   * Read granted containers permissions from an auth URI without the need to connect to the network.
    *
-   * @return {Promise<Array>}
+   * @param uri the IPC response string given
    */
-  readGrantedPermissions(uri: String): Promise<Array<any>>;
+  readGrantedPermissions(uri: string): Promise<Array<any>>;
 
   /**
-   * Get the MutableData for the app's own container generated by Authenticator.
-   * When run in tests, this falls back to the randomly generated version
-   * @return {Promise<MutableData>}
+   * Get the MutableData for the app's own container generated by Authenticator. When run in tests, this falls back to the randomly generated version
    */
   getOwnContainer(): Promise<MutableData>;
 
   /**
    * Whether or not this session has specifc access permission for a given container.
-   * @arg {String} name  name of the container, e.g. `'_public'`
-   * @arg {(String|Array<String>)} [permissions=['Read']] permissions to check for
-   * @returns {Promise<boolean>}
+   *
+   * @param name name of the container, e.g. `'_public'`
+   * @param permissions permissions to check for ('Read' by default)
    */
-  canAccessContainer(name: String, permissions?: (String | String[])): Promise<boolean>;
+  canAccessContainer(name: string, permissions?: (string | string[])): Promise<boolean>;
 
   /**
    * Lookup and return the information necessary to access a container.
-   * @arg name {String} name of the container, e.g. `'_public'`
-   * @returns {Promise<MutableData>} the MutableData behind it
+   *
+   * @param name name of the container, e.g. `'_public'`
+   * @returns the MutableData behind it
    */
-  getContainer(name: String): Promise<MutableData>;
+  getContainer(name: string): Promise<MutableData>;
 
   /**
    * Create a new authenticated or unregistered session using the provided IPC response.
-   * @arg {String} uri the IPC response string given
-   * @returns {Promise<SAFEApp>} the given app instance with a newly setup and
-   *          authenticated session.
+   *
+   * @param uri the IPC response string given
+   * @returns the given app instance with a newly setup and authenticated session.
    */
-  loginFromUri(uri: String): Promise<SAFEApp>;
+  loginFromURI(uri: string): Promise<SAFEApp>;
 
   /**
    * *ONLY AVAILALBE IF RUN in NODE_ENV='development' || 'testing'*
    *
-   * Generate a _locally_ registered App with the given permissions, or
-   * a local unregistered App if permissions is `null`.
-   * @returns {Promise<SAFEApp>} the locally registered/unregistered App instance
+   * Generate a _locally_ registered App with the given permissions, or a local unregistered App if permissions is `null`.
+   *
+   * @returns the locally registered/unregistered App instance
    */
-  loginForTest(): Promise<SAFEApp>;
+  loginForTest(access: any, opts?: { own_container: boolean }): Promise<SAFEApp>;
 
   /**
    * *ONLY AVAILALBE IF RUN in NODE_ENV='development' || 'testing'*
    *
-   * Simulates a network disconnection event. This can be used to
-   * test any logic to be executed by an application when a network
-   * diconnection notification is received.
+   * Simulates a network disconnection event. This can be used to test any logic
+   * to be executed by an application when a network diconnection notification
+   * is received.
    */
   simulateNetworkDisconnect(): void;
-
 }
 
 /**
- * Holds the reference to a Cipher Options,
- * either PlainText, Symmetric or Asymmetric
+ * Holds the reference to a Cipher Options, either PlainText, Symmetric or Asymmetric
  */
-declare class CipherOpt {
-  /**
-   * Holds the reference to a Cipher Options,
-   * either PlainText, Symmetric or Asymmetric
-   */
-  constructor();
-
-}
+declare class CipherOpt {}
 
 /**
  * Provide the Cipher Opt API
  */
 declare class CipherOptInterface {
   /**
-   * Provide the Cipher Opt API
-   */
-  constructor();
-
-  /**
    * Create a PlainText Cipher Opt
-   * @returns {CipherOpt}
    */
   newPlainText(): CipherOpt;
 
   /**
    * Create a new Symmetric Cipher
-   * @returns {CipherOpt}
    */
   newSymmetric(): CipherOpt;
 
   /**
    * Create a new Asymmetric Cipher for the given public encryption key
-   * @param {PubEncKey} pubEncKey
-   * @returns {CipherOpt}
    */
   newAsymmetric(pubEncKey: PubEncKey): CipherOpt;
-
 }
 
 /**
  * Holds the public part of an encryption key
  */
 declare class PubEncKey {
-  /**
-   * Holds the public part of an encryption key
-   */
-  constructor();
 
   /**
    * generate raw string copy of public encryption key
-   * @returns {Promise<Buffer>}
    */
   getRaw(): Promise<Buffer>;
 
   /**
    * Encrypt the input (buffer or string) using the private and public key with a seal
-   * @returns {Promise<Buffer>} Ciphertext
+   *
+   * @returns Ciphertext
    */
   encryptSealed(): Promise<Buffer>;
 
@@ -224,121 +154,104 @@ declare class PubEncKey {
    * Decrypt the given cipher text (buffer or string) using this public
    * encryption key and the given secret key
    *
-   * @arg {Buffer} cipher to decrypt
-   * @arg {SecEncKey} secretEncKey secret encryption key
-   * @returns {Promise<Buffer>} plain text
+   * @param cipher to decrypt
+   * @param secretEncKey secret encryption key
+   * @returns plain text
    */
   decrypt(cipher: Buffer, secretEncKey: SecEncKey): Promise<Buffer>;
 
   /**
-   * Encrypt the input (buffer or string) using this public encryption key
-   * and the given secret key.
+   * Encrypt the input (buffer or string) using this public encryption key and
+   * the given secret key.
    *
-   * @param {Buffer} data to be encrypted
-   * @param {SecEncKey} secretEncKey secret encrpytion key
-   * @returns {Promise<Buffer>} cipher text
+   * @param data to be encrypted
+   * @param secretEncKey secret encrpytion key
+   * @returns cipher text
    */
   encrypt(data: Buffer, secretEncKey: SecEncKey): Promise<Buffer>;
-
 }
 
 /**
  * Holds the secret part of an encryption key
  */
 declare class SecEncKey {
-  /**
-   * Holds the secret part of an encryption key
-   */
-  constructor();
 
   /**
    * generate raw string copy of secret encryption key
-   * @returns {Promise<Buffer>}
    */
   getRaw(): Promise<Buffer>;
 
   /**
    * Decrypt the given cipher text (buffer or string) using this secret
-   * encryption key and the given public key
+   * encryption key and the given public key.
    *
-   * An example use case for this method is if you have received messages from multiple
-   * senders, you may fetch your secret key once, then iterate over the messages along
-   * with passing associated public encryption key to decrypt each message.
+   * An example use case for this method is if you have received messages from
+   * multiple senders, you may fetch your secret key once, then iterate over the
+   * messages along with passing associated public encryption key to decrypt
+   * each message.
    *
-   * @arg {Buffer} cipher to decrypt
-   * @arg {PubEncKey} publicEncKey public encryption key
-   * @returns {Promise<Buffer>} plain text
+   * @param cipher to decrypt
+   * @param publicEncKey public encryption key
+   * @returns plain text
    */
   decrypt(cipher: Buffer, publicEncKey: PubEncKey): Promise<Buffer>;
 
   /**
    * Encrypt the input (buffer or string) using this secret encryption key
-   * and the recipient's public key
+   * and the recipient's public key.
    *
-   * An example use case for this method is if you have multiple intended recipients.
-   * You can fetch your secret key once, then use this method to iterate over
-   * recipient public encryption keys, encrypting data for each key.
+   * An example use case for this method is if you have multiple intended
+   * recipients. You can fetch your secret key once, then use this method to
+   * iterate over recipient public encryption keys, encrypting data for each
+   * key.
    *
-   * @param {Buffer} data to be encrypted
-   * @param {PubEncKey} recipientPubKey recipient's public encryption key
-   * @returns {Promise<Buffer>} cipher text
+   * @param data to be encrypted
+   * @param recipientPubKey recipient's public encryption key
+   * @returns cipher text
    */
   encrypt(data: Buffer, recipientPubKey: PubEncKey): Promise<Buffer>;
-
 }
 
 /**
  * Holds an asymmetric encryption keypair
  */
 declare class EncKeyPair {
-  /**
-   * Holds an asymmetric encryption keypair
-   */
-  constructor();
 
   /**
    * get the Public Encryption key instance of this keypair
-   * @returns {PubEncKey}
    */
-  pubEncKey: any;
+  pubEncKey: PubEncKey;
 
   /**
    * get the Secrect Encryption key instance of this keypair
-   * @returns {secEncKey}
    */
-  secEncKey: any;
+  secEncKey: SecEncKey;
 
   /**
-   * Decrypt the given cipher text with a seal (buffer or string) using
-   * this encryption key pair
-   * @returns {Promise<Buffer>} plain text
+   * Decrypt the given cipher text with a seal (buffer or string) using this
+   * encryption key pair
+   *
+   * @returns plain text
    */
   decryptSealed(): Promise<Buffer>;
-
 }
 
 /**
  * Holds the public part of a sign key
  */
 declare class PubSignKey {
-  /**
-   * Holds the public part of a sign key
-   */
-  constructor();
 
   /**
    * generate raw string copy of public sign key
-   * @returns {Promise<Buffer>}
    */
   getRaw(): Promise<Buffer>;
 
   /**
    * Verify the given signed data (buffer or string) using the public sign key
-   * @param {Buffer} data to verify signature
-   * @returns {Promise<Buffer>}
+   *
+   * @param data to verify signature
    */
   verify(data: Buffer): Promise<Buffer>;
-
 }
 
 /**
@@ -352,40 +265,32 @@ declare class SecSignKey {
 
   /**
    * generate raw string copy of secret sign key
-   * @returns {Promise<Buffer>}
    */
   getRaw(): Promise<Buffer>;
 
   /**
    * Sign the given data (buffer or string) using the secret sign key
-   * @param {Buffer} data to sign
-   * @returns {Promise<Buffer>} signed data
+   *
+   * @param data to sign
+   * @returns signed data
    */
   sign(data: Buffer): Promise<Buffer>;
-
 }
 
 /**
  * Holds a sign key pair
  */
 declare class SignKeyPair {
-  /**
-   * Holds a sign key pair
-   */
-  constructor();
 
   /**
    * get the public sign key instance of this key pair
-   * @returns {PubSignKey}
    */
-  pubSignKey: any;
+  pubSignKey: PubSignKey;
 
   /**
    * get the secrect sign key instance of this key pair
-   * @returns {SecSignKey}
    */
-  secSignKey: any;
-
+  secSignKey: SecSignKey;
 }
 
 /**
@@ -403,151 +308,122 @@ declare class CryptoInterface {
 
   /**
    * Get the public signing key of this session
-   * @returns {Promise<PubSignKey>}
    */
   getAppPubSignKey(): Promise<PubSignKey>;
 
   /**
    * Get the public encryption key of this session
-   * @returns {Promise<PubEncKey>}
    */
   getAppPubEncKey(): Promise<PubEncKey>;
 
   /**
    * Generate a new Asymmetric Encryption Key Pair
-   * @returns {Promise<EncKeyPair>}
    */
   generateEncKeyPair(): Promise<EncKeyPair>;
 
   /**
    * Generate a new Sign Key Pair (public & private keys).
-   * @returns {Promise<SignKeyPair>}
    */
   generateSignKeyPair(): Promise<SignKeyPair>;
 
   /**
    * Generate a new Asymmetric Encryption Key Pair from raw secret and public keys
-   * @returns {Promise<EncKeyPair>}
    */
   generateEncKeyPairFromRaw(): Promise<EncKeyPair>;
 
   /**
    * Generate a new Sign Key Pair from raw secret and public keys
-   * @returns {Promise<SignKeyPair>}
    */
   generateSignKeyPairFromRaw(): Promise<SignKeyPair>;
 
   /**
    * Interprete the Public Sign Key from a given raw string
-   * @param {String} raw public sign key raw bytes as string
-   * @returns {Promise<PubSignKey>}
+   * @param raw public sign key raw bytes as string
    */
-  pubSignKeyFromRaw(raw: String): Promise<PubSignKey>;
+  pubSignKeyFromRaw(raw: string): Promise<PubSignKey>;
 
   /**
    * Interprete the Secret Sign Key from a given raw string
-   * @param {String} raw secret sign key raw bytes as string
-   * @returns {Promise<SecSignKey>}
+   *
+   * @param raw secret sign key raw bytes as string
    */
-  secSignKeyFromRaw(raw: String): Promise<SecSignKey>;
+  secSignKeyFromRaw(raw: string): Promise<SecSignKey>;
 
   /**
    * Interprete the public encryption Key from a given raw string
-   * @arg {String} raw public encryption key raw bytes as string
-   * @returns {Promise<PubEncKey>}
+   *
+   * @param raw public encryption key raw bytes as string
    */
-  pubEncKeyFromRaw(raw: String): Promise<PubEncKey>;
+  pubEncKeyFromRaw(raw: string): Promise<PubEncKey>;
 
   /**
    * Interprete the secret encryption Key from a given raw string
-   * @arg {String} raw secret encryption key raw bytes as string
-   * @returns {Promise<SecEncKey>}
+   *
+   * @param raw secret encryption key raw bytes as string
    */
-  secEncKeyFromRaw(raw: String): Promise<SecEncKey>;
-
+  secEncKeyFromRaw(raw: string): Promise<SecEncKey>;
 }
-
-/**
- * Emulations are abstraction helpers on top of MData
- * @typedef {NFS} Emulation
- */
-type Emulation = NFS;
 
 /**
  * A NFS-style NfsFile
  *
- * _Note_: As this application layer, the network does not check any
- * of the metadata provided.
+ * _Note_: As this application layer, the network does not check any of the
+ * metadata provided.
  */
 declare class NfsFile {
-  /**
-   * A NFS-style NfsFile
-   *
-   * _Note_: As this application layer, the network does not check any
-   * of the metadata provided.
-   */
-  constructor(ref: Object);
+  constructor(ref: any);
 
   /**
    * The dataMapName to read the immutable data at
-   * @returns {Buffer} XoR-name
+   *
+   * @returns XoR-name
    */
-  dataMapName: any;
+  dataMapName: Buffer;
 
   /**
-   *
-   * @returns {Buffer} user_metadata
+   * @returns user_metadata
    */
-  userMetadata: any;
+  userMetadata: Buffer;
 
   /**
    * When was this created? in UTC.
-   * @return {Date}
    */
-  created: any;
+  created: Date;
 
   /**
    * When was this last modified? in UTC.
-   * @return {Date}
    */
-  modified: any;
+  modified: Date;
 
   /**
    * Get file size
-   * @returns {Promise<Number>}
    */
-  size(): Promise<Number>;
+  size(): Promise<number>;
 
   /**
-   * Read the file.
-   * SafeNodeApp.CONSTANTS.NFS_FILE_START and SafeNodeApp.CONSTANTS.NFS_FILE_END may be used
-   * to read the entire content of the file. These constants are
-   * exposed by the safe-app-nodejs package.
-   * @param {Number|SafeNodeApp.CONSTANTS.NFS_FILE_START} position
-   * @param {Number|SafeNodeApp.CONSTANTS.NFS_FILE_END} len
-   * @returns {Promise<[Buffer, number]>}
+   * Read the file. NFS_FILE_START and NFS_FILE_END may be used to read the
+   * entire content of the file. These constants are exposed by the
+   * safe-app-nodejs package.
+   *
+   * @param position
+   * @param len
    */
-  read(position: (Number | SafeNodeApp.CONSTANTS.MD_ENTRIES_EMPTY), len: (Number | SafeNodeApp.CONSTANTS.NFS_FILE_END)): Promise<[Buffer, number]>;
+  read(position: (number | SafeNodeApp.CONSTANTS.MD_ENTRIES_EMPTY), len: (number | SafeNodeApp.CONSTANTS.NFS_FILE_END)): Promise<[Buffer, number]>;
 
   /**
    * Write file
-   * @param {Buffer|String} content
-   * @returns {Promise}
    */
-  write(content: (Buffer | String)): Promise<void>;
+  write(content: (Buffer | string)): Promise<void>;
 
   /**
    * Close file
-   * @returns {Promise}
    */
   close(): Promise<void>;
 
   /**
    * Which version was this? Equals the underlying MutableData's entry version.
-   * @return {Number}
    */
-  version: any;
-
+  version: number;
 }
 
 /**
@@ -561,46 +437,46 @@ declare class NFS {
 
   /**
    * Helper function to create and save file to the network
-   * @param {String|Buffer} content - file contents
-   * @returns {NfsFile} a newly created file
+   *
+   * @param content file contents
+   * @returns  a newly created file
    */
-  create(content: (String | Buffer)): NfsFile;
+  create(content: (string | Buffer)): NfsFile;
 
   /**
    * Find the file of the given filename (aka keyName in the MutableData)
-   * @param {String} fileName - the path/file name
-   * @returns {Promise<NfsFile>} - the file found for that path
+   *
+   * @param fileName the path/file name
+   * @returns the file found for that path
    */
-  fetch(fileName: String): Promise<NfsFile>;
+  fetch(fileName: string): Promise<NfsFile>;
 
   /**
-   * Insert the given file into the underlying MutableData, directly commit
-   * to the network.
-   * @param {(String|Buffer)} fileName - the path to store the file under
-   * @param {NfsFile} file - the file to serialise and store
-   * @param {String|Buffer} userMetadata
-   * @returns {Promise<NfsFile>} - the same file
+   * Insert the given file into the underlying MutableData, directly commit to
+   * the network.
+   *
+   * @param fileName - the path to store the file under
+   * @param file - the file to serialise and store
+   * @param userMetadata
+   * @returns the same file
    */
-  insert(fileName: (String | Buffer), file: NfsFile, userMetadata: (String | Buffer)): Promise<NfsFile>;
+  insert(fileName: (string | Buffer), file: NfsFile, userMetadata: (string | Buffer)): Promise<NfsFile>;
 
   /**
    * Replace a path with a new file. Directly commit to the network.
-   * @param {(String|Buffer)} fileName - the path to store the file under
-   * @param {NfsFile} file - the file to serialise and store
-   * @param {Number} version - the version successor number, to ensure you
-  are overwriting the right one
-   * @param {String|Buffer} userMetadata - optional parameter for updating user metadata
-   * @returns {Promise<NfsFile>} - the same file
+   *
+   * @param fileName the path to store the file under
+   * @param file the file to serialise and store
+   * @param versionthe version successor number, to ensure you are overwriting the right one
+   * @param userMetadata - optional parameter for updating user metadata
+   * @returns the same file
    */
-  update(fileName: (String | Buffer), file: NfsFile, version: Number, userMetadata: (String | Buffer)): Promise<NfsFile>;
+  update(fileName: (string | Buffer), file: NfsFile, version: number, userMetadata: (string | Buffer)): Promise<NfsFile>;
 
   /**
    * Delete a file from path. Directly commit to the network.
-   * @param {(String|Buffer)} fileName
-   * @param {Number} version
-   * @returns {Promise}
    */
-  delete(fileName: (String | Buffer), version: Number): Promise<void>;
+  delete(fileName: (string | Buffer), version: number): Promise<void>;
 
   /**
    * Open a file for reading or writing.
@@ -608,19 +484,14 @@ declare class NFS {
    * Open modes (these constants are exported by the safe-app-nodejs package):
    *
    * SafeNodeApp.CONSTANTS.NFS_FILE_MODE_OVERWRITE: Replaces the entire content of the file when writing data.
-   *
    * SafeNodeApp.CONSTANTS.NFS_FILE_MODE_APPEND: Appends to existing data in the file.
-   *
    * SafeNodeApp.CONSTANTS.NFS_FILE_MODE_READ: Open file to read.
    *
-   * @param {NfsFile} file
-   * @param {Number|SafeNodeApp.CONSTANTS.NFS_FILE_MODE_OVERWRITE|
-   *         SafeNodeApp.CONSTANTS.NFS_FILE_MODE_APPEND|
-   *         SafeNodeApp.CONSTANTS.NFS_FILE_MODE_READ} [openMode=SafeNodeApp.CONSTANTS.NFS_FILE_MODE_OVERWRITE]
+   * @param file
+   * @param NfsFile Defaults to NFS_FILE_MODE_OVERWRITE.
    * @returns {Promise<NfsFile>}
    */
-  open(file: NfsFile, openMode?: (Number | SafeNodeApp.CONSTANTS.NFS_FILE_MODE_OVERWRITE | SafeNodeApp.CONSTANTS.NFS_FILE_MODE_APPEND | SafeNodeApp.CONSTANTS.NFS_FILE_MODE_READ)): Promise<NfsFile>;
-
+  open(file: NfsFile, openMode?: (number | SafeNodeApp.CONSTANTS.NFS_FILE_MODE_OVERWRITE | SafeNodeApp.CONSTANTS.NFS_FILE_MODE_APPEND | SafeNodeApp.CONSTANTS.NFS_FILE_MODE_READ)): Promise<NfsFile>;
 }
 
 /**
@@ -634,69 +505,37 @@ declare class Reader {
 
   /**
    * Read the given amount of bytes from the network
-   * @param {Object=} options
-   * @param {Number} [options.offset=0] start position
-   * @param {Number} [options.end=size] end position or end of data
+   *
+   * @param options [offset=0] start position; [end=size] end position or end of data.
    */
-  read(options?: { offset: Number, end: Number }): void;
+  read(options?: { offset: number, end: number }): void;
 
   /**
    * The size of the immutable data on the network
-   * @returns {Promise<Number>} length in bytes
+   *
+   * @returns length in bytes
    */
-  size(): Promise<Number>;
+  size(): Promise<number>;
 }
 
 /**
  * Holds an Immutable Data Writer
- *
- * @example // write new data to the network
- * app.immutableData.create()
- *  .then((writer) => writer.write("some string\n")
- *    .then(() => writer.write("second string"))
- *    .then(() => app.cipherOpt.newPlainText())
- *    .then((cipher) => writer.close(cipher))
- *  ).then((address) => app.immutableData.fetch(address))
- *  .then((reader) => reader.read())
- *  .then((payload) => {
- *    console.log("Data read from ImmutableData: ", payload.toString());
- *  })
- *
  */
 declare class Writer {
   /**
-   * Holds an Immutable Data Writer
-   *
-   * @example // write new data to the network
-   * app.immutableData.create()
-   *  .then((writer) => writer.write("some string\n")
-   *    .then(() => writer.write("second string"))
-   *    .then(() => app.cipherOpt.newPlainText())
-   *    .then((cipher) => writer.close(cipher))
-   *  ).then((address) => app.immutableData.fetch(address))
-   *  .then((reader) => reader.read())
-   *  .then((payload) => {
-   *    console.log("Data read from ImmutableData: ", payload.toString());
-   *  })
-   *
-   */
-  constructor();
-
-  /**
    * Append the given data to immutable Data.
    *
-   * @param {String|Buffer} data The string or buffer to write
-   * @returns {Promise<void>}
+   * @param data The string or buffer to write
    */
-  write(data: (String | Buffer)): Promise<void>;
+  write(data: (string | Buffer)): Promise<void>;
 
   /**
    * Close and write the immutable Data to the network.
    *
-   * @param {CipherOpt} cipherOpt the Cipher Opt to encrypt data with
-   * @returns {Promise<String>} the address to the data once written to the network
+   * @param cipherOpt the Cipher Opt to encrypt data with
+   * @returns the address to the data once written to the network
    */
-  close(cipherOpt: CipherOpt): Promise<String>;
+  close(cipherOpt: CipherOpt): Promise<string>;
 }
 
 /**
@@ -714,14 +553,13 @@ declare class ImmutableDataInterface {
 
   /**
    * Create a new ImmutableDataInterface
-   * @returns {Promise<Writer>}
    */
   create(): Promise<Writer>;
 
   /**
    * Look up an existing Immutable Data for the given address
-   * @param {Buffer} address the XorName on the network
-   * @returns {Promise<Reader>}
+   *
+   * @param address the XorName on the network
    */
   fetch(address: Buffer): Promise<Reader>;
 
@@ -731,38 +569,36 @@ declare class ImmutableDataInterface {
  * Holds the permissions of a MutableData object
  */
 declare class Permissions {
-  /**
-   * Holds the permissions of a MutableData object
-   */
-  constructor();
 
   /**
    * Total number of permission entries
-   * @returns {Promise<Number>} number of entries
+   *
+   * @returns number of entries
    */
-  len(): Promise<Number>;
+  len(): Promise<number>;
 
   /**
    * Lookup the permissions of a specifc key
    *
-   * @param {PubSignKey|SafeNodeApp.CONSTANTS.USER_ANYONE} [signKey=SafeNodeApp.CONSTANTS.USER_ANYONE] the key to lookup for
-   * @returns {Promise<Object>} the permission set for that key
+   * @param signKey The key to lookup for. Defaults to USER_ANYONE.
+   * @returns the permission set for that key
    */
-  getPermissionSet(signKey?: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE)): Promise<Object>;
+  getPermissionSet(signKey?: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE)): Promise<any>;
 
   /**
-   * Insert a new permission set mapped to a specifc key. Directly commits
-   * to the network.
-   * Requires 'ManagePermissions'-Permission for the app.
-   * @param {PubSignKey|SafeNodeApp.CONSTANTS.USER_ANYONE} [signKey=SafeNodeApp.CONSTANTS.USER_ANYONE] the key to map to
-   * @param {Object} permissionSet the permission set to insert
-   * @returns {Promise} once finished
+   * Insert a new permission set mapped to a specifc key. Directly commits to
+   * the network. Requires 'ManagePermissions'-Permission for the app.
+   *
+   * @param signKey The key to map to. (Defaults to USER_ANYONE.)
+   * @param permissionSet The permission set to insert.
+   * @returns once finished
    */
-  insertPermissionSet(signKey: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE), permissionSet: Object): Promise<void>;
+  insertPermissionSet(signKey: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE), permissionSet: any): Promise<void>;
 
   /**
    * Return the list of all associated permission sets.
-   * @returns {Promise<Array>} the list of permission sets
+   *
+   * @returns the list of permission sets
    */
   listPermissionSets(): Promise<Array<any>>;
 
@@ -774,66 +610,35 @@ declare class Permissions {
  *
  * You need this whenever you want to change the content of
  * the entries.
- *
- * @example // Mutate a range of Entries
- *
- * app.mutableData.newPublic(somename, tagtype)
- *  .then((mData) => mData.getEntries()
- *   .then((entries) => entries.mutate()
- *     .then((m) => m.insert('key', 'value')
- *       // this is where all mutations are recorded
- *       .then(() => mData.applyEntriesMutation(m))
- *     )))
  */
 declare class EntryMutationTransaction {
   /**
-   * Holds a mutations to be done to the entries within one
-   * transaction on the network.
-   *
-   * You need this whenever you want to change the content of
-   * the entries.
-   *
-   * @example // Mutate a range of Entries
-   *
-   * app.mutableData.newPublic(somename, tagtype)
-   *  .then((mData) => mData.getEntries()
-   *   .then((entries) => entries.mutate()
-   *     .then((m) => m.insert('key', 'value')
-   *       // this is where all mutations are recorded
-   *       .then(() => mData.applyEntriesMutation(m))
-   *     )))
-   */
-  constructor();
-
-  /**
    * Store a new `Insert`-Action in the transaction to store a new entry.
    *
-   * @param {(String|Buffer)} keyName the key you want to insert
-   * @param {(String|Buffer)} value the value you want to insert
-   * @returns {Promise} resolves once the storing is done
+   * @param keyName the key you want to insert
+   * @param value the value you want to insert
+   * @returns resolves once the storing is done
    */
-  insert(keyName: (String | Buffer), value: (String | Buffer)): Promise<void>;
+  insert(keyName: (string | Buffer), value: (string | Buffer)): Promise<void>;
 
   /**
    * Store a new `Delete`-Action in the transaction to delete an existing entry.
    *
-   * @param {(String|Buffer)} keyName the key you want to delete
-   * @param {Number} version the version successor, to confirm you are
-   *        actually asking for the right version
-   * @returns {Promise} resolves once the storing is done
+   * @param keyName the key you want to delete
+   * @param version the version successor, to confirm you are actually asking for the right version
+   * @returns resolves once the storing is done
    */
-  delete(keyName: (String | Buffer), version: Number): Promise<void>;
+  delete(keyName: (string | Buffer), version: number): Promise<void>;
 
   /**
    * Store a `Update`-Action in the transaction to update an existing entry.
    *
-   * @param {(String|Buffer)} keyName the key for the entry you want to update
-   * @param {(String|Buffer)} value the value to upate to
-   * @param {Number} version - the version successor, to confirm you are
-   *        actually asking for the right version
-   * @returns {Promise} resolves once the storing is done
+   * @param keyName the key for the entry you want to update
+   * @param value the value to upate to
+   * @param version the version successor, to confirm you are actually asking for the right version
+   * @returns resolves once the storing is done
    */
-  update(keyName: (String | Buffer), value: (String | Buffer), version: Number): Promise<void>;
+  update(keyName: (string | Buffer), value: (string | Buffer), version: number): Promise<void>;
 
 }
 
@@ -842,352 +647,296 @@ declare class EntryMutationTransaction {
  */
 declare class Entries {
   /**
-   * Represent the Entries of a MutableData network object
-   */
-  constructor();
-
-  /**
    * Get the total number of entries in the MutableData
-   * @returns {Promise<Number>} number of entries
+   *
+   * @returns number of entries
    */
-  len(): Promise<Number>;
+  len(): Promise<number>;
 
   /**
    * Look up the value of a specific key
    *
-   * @param {String} keyName the key to lookup
-   * @returns {Promise<ValueVersion>} the entry's value and the current version
+   * @param keyName the key to lookup
+   * @returns the entry's value and the current version
    */
-  get(keyName: String): Promise<ValueVersion>;
+  get(keyName: string): Promise<ValueVersion>;
 
   /**
    * Get a list with the entries contained in this MutableData
-   * @returns {Promise<Array<any>>} the entries list
+   *
+   * @returns the entries list
    */
   listEntries(): Promise<Array<any>>;
 
   /**
-   * Insert a new entry. Once you call `MutableData.put` with this entry,
-   * it will fail if the entry already exists or the current app doesn't have the
+   * Insert a new entry. Once you call `MutableData.put` with this entry, it
+   * will fail if the entry already exists or the current app doesn't have the
    * permissions to edit that mutable data.
    *
-   *
-   * @param {(String|Buffer)} keyName the key you want store the data under
-   * @param {(String|Buffer)} value the data you want to store
-   * @returns {Promise} resolves once storing is done
+   * @param keyName the key you want store the data under
+   * @param value the data you want to store
+   * @returns resolves once storing is done
    */
-  insert(keyName: (String | Buffer), value: (String | Buffer)): Promise<void>;
+  insert(keyName: (string | Buffer), value: (string | Buffer)): Promise<void>;
 
   /**
    * Create a new mutation transaction for the entries
-   * @return {Promise<EntryMutationTransaction>} the mutation transaction object
+   *
+   * @return  the mutation transaction object
    */
   mutate(): Promise<EntryMutationTransaction>;
 
 }
 
 /**
- * @typedef {Object} ValueVersion
- * @param {Buffer} buf the buffer with the value
- * @param {Number} version the version
  * Holds the informatation of a value of a MutableData
  */
-type ValueVersion = Object;
+interface ValueVersion {
+  // the buffer with the value
+  buf: Buffer;
+  // the version
+  version: Buffer;
+}
 
-/**
- * @typedef {Object} NameAndTag
- * @param {Buffer} name - the XoR-name/address on the network
- * @param {Number} typeTag - the type tag
- */
-type NameAndTag = Object;
+interface NameAndTag {
+  // the XoR-name/address on the network
+  name: Buffer;
+  // the type tag
+  typeTag: number;
+}
 
 /**
  * Holds the reference to a MutableData
  */
 declare class MutableData {
   /**
-   * Holds the reference to a MutableData
+   * Easily set up a newly (not yet created) MutableData with the app having
+   * full-access permissions (and no other). The name and description parameters
+   * are metadata for the MutableData which can be used to identify what this
+   * MutablaData contains. The metadata is particularly used by the
+   * Authenticator when another application has requested mutation permissions
+   * on this MutableData, so the user can make a better decision to either
+   * allow or deny such a request based on this information.
+   *
+   * @param data a key-value payload it should create the data with
+   * @param name a descriptive name for the MutableData
+   * @param  description a detailed description for the MutableData content
+   * @returns self
    */
-  constructor();
+  quickSetup(data: any, name: (string | Buffer), description: (string | Buffer)): Promise<MutableData>;
 
   /**
-   * Easily set up a newly (not yet created) MutableData with
-   * the app having full-access permissions (and no other).
-   * The name and description parameters are metadata for the MutableData which
-   * can be used to identify what this MutablaData contains.
-   * The metadata is particularly used by the Authenticator when another
-   * application has requested mutation permissions on this MutableData,
-   * so the user can make a better decision to either allow or deny such a
-   * request based on this information.
+   * Set the metadata information in the MutableData. Note this can be used only
+   * if the MutableData was already committed to the network, .i.e either with
+   * `put`, with `quickSetup`, or if it is an already existing MutableData just
+   * fetched from the network. The metadata is particularly used by the
+   * Authenticator when another application has requested mutation permissions
+   * on this MutableData, displaying this information to the user, so the user
+   * can make a better decision to either allow or deny such a request based on
+   * it.
    *
-   * @param {Object} data a key-value payload it should
-   *        create the data with
-   * @param {(String|Buffer)} name a descriptive name for the MutableData
-   * @param {(String|Buffer)} description a detailed description for the MutableData content
-   *
-   * @returns {Promise<MutableData>} self
-   * @example
-   * app.mutableData.newRandomPublic(tagtype)
-   *   .then((md) => md.quickSetup({
-   *        key1: 'value1',
-   *        key2: 'value2'
-   *      }, 'My MutableData', 'To store my app\'s data'))
+   * @param name a descriptive name for the MutableData
+   * @param description a detailed description for the MutableData content
+   * @returns resolves once finished
    */
-  quickSetup(data: Object, name: (String | Buffer), description: (String | Buffer)): Promise<MutableData>;
+  setMetadata(name: (string | Buffer), description: (string | Buffer)): Promise<void>;
 
   /**
-   * Set the metadata information in the MutableData. Note this can be used
-   * only if the MutableData was already committed to the network, .i.e either
-   * with `put`, with `quickSetup`, or if it is an already existing MutableData
-   * just fetched from the network.
-   * The metadata is particularly used by the Authenticator when another
-   * application has requested mutation permissions on this MutableData,
-   * displaying this information to the user, so the user can make a better
-   * decision to either allow or deny such a request based on it.
+   * Encrypt the entry key provided as parameter with the encryption key contained
+   * in a Private MutableData. If the MutableData is Public, the same (and
+   * unencrypted) value is returned.
    *
-   * @param {(String|Buffer)} name a descriptive name for the MutableData
-   * @param {(String|Buffer)} description a detailed description for the MutableData content
-   *
-   * @returns {Promise} resolves once finished
+   * @param key the key you want to encrypt
+   * @returns the encrypted entry key
    */
-  setMetadata(name: (String | Buffer), description: (String | Buffer)): Promise<void>;
-
-  /**
-   * Encrypt the entry key provided as parameter with the encryption key
-   * contained in a Private MutableData. If the MutableData is Public, the same
-   * (and unencrypted) value is returned.
-   *
-   * @param {(String|Buffer)} key the key you want to encrypt
-   * @returns {Promise<Buffer>} the encrypted entry key
-   */
-  encryptKey(key: (String | Buffer)): Promise<Buffer>;
+  encryptKey(key: (string | Buffer)): Promise<Buffer>;
 
   /**
    * Encrypt the entry value provided as parameter with the encryption key
    * contained in a Private MutableData. If the MutableData is Public, the same
    * (and unencrypted) value is returned.
    *
-   * @param {(String|Buffer)} value the data you want to encrypt
-   * @returns {Promise<Buffer>} the encrypted entry value
+   * @param value the data you want to encrypt
+   * @returns the encrypted entry value
    */
-  encryptValue(value: (String | Buffer)): Promise<Buffer>;
+  encryptValue(value: (string | Buffer)): Promise<Buffer>;
 
   /**
    * Decrypt the entry key/value provided as parameter with the encryption key
    * contained in a Private MutableData.
    *
-   * @param {(String|Buffer)} value the data you want to decrypt
-   * @returns {Promise<Buffer>} the decrypted value
+   * @param value the data you want to decrypt
+   * @returns the decrypted value
    */
-  decrypt(value: (String | Buffer)): Promise<Buffer>;
+  decrypt(value: (string | Buffer)): Promise<Buffer>;
 
   /**
-   * Look up the name and tag of the MutableData as required to look it
-   * up on the network.
+   * Look up the name and tag of the MutableData as required to look it up on
+   * the network.
    *
-   * @returns {Promise<NameAndTag>} the XoR-name and type tag
+   * @returns the XoR-name and type tag
    */
   getNameAndTag(): Promise<NameAndTag>;
 
   /**
    * Look up the mutable data object version on the network
    *
-   * @returns {Promise<Number>} current version
+   * @returns current version
    */
-  getVersion(): Promise<Number>;
+  getVersion(): Promise<number>;
 
   /**
    * Look up the value of a specific key
    *
-   * @returns {Promise<ValueVersion>} the entry value and its current version
+   * @returns the entry value and its current version
    */
   get(): Promise<ValueVersion>;
 
   /**
    * Commit this MutableData to the network.
-   * @param {Permission|SafeNodeApp.CONSTANTS.MD_PERMISSION_EMPTY} permissions
-   * the permissions to create the mutable data with
-   * @param {Entries|SafeNodeApp.CONSTANTS.MD_ENTRIES_EMPTY} entries
-   * data entries to create the mutable data with
-   * @returns {Promise}
+   *
+   * @param permissions the permissions to create the mutable data with
+   * @param  entries data entries to create the mutable data with
    */
   put(permissions: (Permissions | SafeNodeApp.CONSTANTS.MD_PERMISSION_EMPTY), entries: (Entries | SafeNodeApp.CONSTANTS.MD_ENTRIES_EMPTY)): Promise<void>;
 
   /**
    * Get a Handle to the entries associated with this MutableData
-   * @returns {Promise<(Entries)>} the entries representation object
+   * @returns the entries representation object
    */
   getEntries(): Promise<(Entries)>;
 
   /**
    * Get a list with the keys contained in this MutableData
-   * @returns {Promise<Array<any>>} the keys list
+   * @returns the keys list
    */
   getKeys(): Promise<Array<any>>;
 
   /**
    * Get the list of values contained in this MutableData
-   * @returns {Promise<Array<any>>} the list of values
+   * @returns the list of values
    */
   getValues(): Promise<Array<any>>;
 
   /**
    * Get a Handle to the permissions associated with this mutableData
-   * @returns {Promise<(Permissions)>} the permissions representation object
+   * @returns the permissions representation object
    */
   getPermissions(): Promise<(Permissions)>;
 
   /**
-   * Get a Handle to the permissions associated with this MutableData for
-   * a specifc key
-   * @param {PubSignKey|SafeNodeApp.CONSTANTS.USER_ANYONE} [signKey=SafeNodeApp.CONSTANTS.USER_ANYONE] the key to look up
-   * @returns {Promise<(Permissions)>} the permissions set associated to the key
+   * Get a Handle to the permissions associated with this MutableData for a
+   * specifc key
+   *
+   * @param signKey the key to look up. Defaults to USER_ANYONE.
+   * @returns the permissions set associated to the key
    */
   getUserPermissions(signKey: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE)): Promise<(Permissions)>;
 
   /**
    * Delete the permissions of a specifc key. Directly commits to the network.
    * Requires 'ManagePermissions'-Permission for the app.
-   * @param {PubSignKey|SafeNodeApp.CONSTANTS.USER_ANYONE} [signKey=SafeNodeApp.CONSTANTS.USER_ANYONE] the key to lookup for
-   * @param {Number} version the version successor, to confirm you are
-   *        actually asking for the right one
-   * @returns {Promise} once finished
+   *
+   * @param signKey The key to lookup for. Defaults to USER_ANYONE.
+   * @param version the version successor, to confirm you are actually asking for the right one
+   * @returns once finished
    */
-  delUserPermissions(signKey: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE), version: Number): Promise<void>;
+  delUserPermissions(signKey: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE), version: number): Promise<void>;
 
   /**
    * Set the permissions of a specifc key. Directly commits to the network.
    * Requires 'ManagePermissions'-Permission for the app.
-   * @param {PubSignKey|SafeNodeApp.CONSTANTS.USER_ANYONE} [signKey=SafeNodeApp.CONSTANTS.USER_ANYONE] the key to lookup for
-   * @param {PermissionSet} permissionSet the permission set to set to
-   * @param {Number} version the version successor, to confirm you are
-   *        actually asking for the right one
-   * @returns {Promise} resolves once finished
+   *
+   * @param signKey the key to lookup for. Defaults to USER_ANYONE.
+   * @param permissionSet the permission set to set to
+   * @param version the version successor, to confirm you are actually asking for the right one
+   * @returns resolves once finished
    */
-  setUserPermissions(signKey: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE), permissionSet: any, version: Number): Promise<void>;
+  setUserPermissions(signKey: (PubSignKey | SafeNodeApp.CONSTANTS.USER_ANYONE), permissionSet: any, version: number): Promise<void>;
 
   /**
    * Commit the transaction to the network
-   * @param {EntryMutationTransaction} mutations the Mutations you want to apply
-   * @return {Promise} resolves once finished
+   *
+   * @param mutations the Mutations you want to apply
+   * @return resolves once finished
    */
   applyEntriesMutation(mutations: EntryMutationTransaction): Promise<void>;
 
   /**
    * Serialise the current MutableData
-   * @returns {Promise<(String)>} the serialilsed version of the MutableData
+   *
+   * @returns the serialilsed version of the MutableData
    */
-  serialise(): Promise<(String)>;
+  serialise(): Promise<(string)>;
 
   /**
    * Get serialised size of current MutableData
-   * @returns {Promise<(Number)>} the serialilsed size of the MutableData
+   *
+   * @returns the serialilsed size of the MutableData
    */
-  getSerialisedSize(): Promise<(Number)>;
+  getSerialisedSize(): Promise<number>;
 
   /**
    * Wrap this MutableData into a known abstraction. Currently only known: `NFS`
-   * @param {String} eml - name of the emulation
-   * @returns {Emulation} the Emulation you are asking for
+   *
+   * @param eml name of the emulation
+   * @returns the Emulation you are asking for
    */
-  emulateAs(eml: String): Emulation;
-
+  emulateAs(eml: string): NFS;
 }
 
 /**
  * Provide the MutableData API for the session.
  *
  * Access via `mutableData` on your app Instance.
- *
- * @example // using mutable Data
- * app.mutableData.newRandomPublic(15001)
- *   // set it up with starting data
- *   .then((mdata) => mdata.quickSetup({keyA: 'input value'})
- *    .then(() => mdata.getNameAndTag())) // return name and tag
- *
- * // now read using name and tag
- * .then((ref) => app.mutableData.newPublic(ref.name, ref.tag)
- *   .then((mdata) => mdata.get('keyA').then((val) => {
- *     should(val.buf.toString()).equal('input value');
- *   })))
  */
 declare class MutableDataInterface {
-  /**
-   * Provide the MutableData API for the session.
-   *
-   * Access via `mutableData` on your app Instance.
-   *
-   * @example // using mutable Data
-   * app.mutableData.newRandomPublic(15001)
-   *   // set it up with starting data
-   *   .then((mdata) => mdata.quickSetup({keyA: 'input value'})
-   *    .then(() => mdata.getNameAndTag())) // return name and tag
-   *
-   * // now read using name and tag
-   * .then((ref) => app.mutableData.newPublic(ref.name, ref.tag)
-   *   .then((mdata) => mdata.get('keyA').then((val) => {
-   *     should(val.buf.toString()).equal('input value');
-   *   })))
-   */
   constructor(app: SAFEApp);
 
   /**
-   * Create a new mutuable data at a random address with private
-   * access.
-   * @param {Number} typeTag the typeTag to use
-   * @returns {Promise<MutableData>}
+   * Create a new mutuable data at a random address with private access.
+   *
+   * @param typeTag the typeTag to use
    */
-  newRandomPrivate(typeTag: Number): Promise<MutableData>;
+  newRandomPrivate(typeTag: number): Promise<MutableData>;
 
   /**
-   * Create a new mutuable data at a random address with public
-   * access.
-   * @param {Number} typeTag - the typeTag to use
-   * @returns {Promise<MutableData>}
+   * Create a new mutuable data at a random address with public access.
+   * @param typeTag - the typeTag to use
    */
-  newRandomPublic(typeTag: Number): Promise<MutableData>;
+  newRandomPublic(typeTag: number): Promise<MutableData>;
 
   /**
-   * Initiate a mutuable data at the given address with private
-   * access.
-   * @param {Buffer|String} name
-   * @param {Number} typeTag - the typeTag to use
-   * @param {Buffer|String} secKey
-   * @param {Buffer|String} nonce
-   * @returns {Promise<MutableData>}
+   * Initiate a mutuable data at the given address with private access.
+   *
+   * @param typeTag the typeTag to use
    */
-  newPrivate(name: (Buffer | String), typeTag: Number, secKey: (Buffer | String), nonce: (Buffer | String)): Promise<MutableData>;
+  newPrivate(name: (Buffer | string), typeTag: number, secKey: (Buffer | string), nonce: (Buffer | string)): Promise<MutableData>;
 
   /**
-   * Initiate a mutuable data at the given address with public
-   * access.
-   * @param {Buffer|String}
-   * @param {Number} typeTag the typeTag to use
-   * @returns {Promise<MutableData>}
+   * Initiate a mutuable data at the given address with public access.
+   *
+   * @param typeTag the typeTag to use
    */
-  newPublic(name: (Buffer | String), typeTag: Number): Promise<MutableData>;
+  newPublic(name: (Buffer | string), typeTag: number): Promise<MutableData>;
 
   /**
    * Create a new Permissions object.
-   * @returns {Promise<Permissions>}
    */
   newPermissions(): Promise<Permissions>;
 
   /**
    * Create a new EntryMutationTransaction object.
-   * @returns {Promise<EntryMutationTransaction>}
    */
   newMutation(): Promise<EntryMutationTransaction>;
 
   /**
    * Create a new Entries object.
-   * @returns {Promise<Entries>}
    */
   newEntries(): Promise<Entries>;
 
   /**
    * Create a new Mutuable Data object from its serial
-   * @returns {Promise<MutableData>}
    */
   fromSerial(): Promise<MutableData>;
 
@@ -1225,86 +974,71 @@ declare class SAFEApp {
 
   /**
    * get the AuthInterface instance connected to this session
-   * @returns {AuthInterface}
    */
-  auth: any;
+  auth: AuthInterface;
 
   /**
    * get the Crypto instance connected to this session
-   * @returns {CryptoInterface}
    */
-  crypto: any;
+  crypto: CryptoInterface;
 
   /**
    * get the CipherOptInterface instance connected to this session
-   * @returns {CipherOptInterface}
    */
-  cipherOpt: any;
+  cipherOpt: CipherOptInterface;
 
   /**
    * get the ImmutableDataInterface instance connected to this session
-   * @returns {ImmutableDataInterface}
    */
-  immutableData: any;
+  immutableData: ImmutableDataInterface;
 
   /**
    * get the MutableDataInterface instance connected to this session
-   * @returns {MutableDataInterface}
    */
-  mutableData: any;
+  mutableData: MutableDataInterface;
 
   /**
    * Returns true if current network connection state is INIT.
    * This is state means the library has been initialised but there is no
    * connection made with the network yet.
-   *
-   * @returns {Boolean}
    */
-  isNetStateInit(): Boolean;
+  isNetStateInit(): boolean;
 
   /**
    * Returns true if current network connection state is CONNECTED.
-   *
-   * @returns {Boolean}
    */
-  isNetStateConnected(): Boolean;
+  isNetStateConnected(): boolean;
 
   /**
    * Returns true if current network connection state is DISCONNECTED.
-   *
-   * @returns {Boolean}
    */
-  isNetStateDisconnected(): Boolean;
+  isNetStateDisconnected(): boolean;
 
   /**
    * The current appInfo
    */
-  appInfo: any;
+  appInfo: AppInfo;
 
   /**
    * Returns account information, e.g. number of mutations done and available.
-   *
-   * @returns {Promise<AccountInfo>}
    */
   getAccountInfo(): Promise<AccountInfo>;
 
   /**
    * Create a SAFEApp and try to login it through the `authUri`
    *
-   * @param {AppInfo} appInfo - the AppInfo
-   * @param {String} authUri - URI containing the authentication info
-   * @param {Function} [networkStateCallBack=null] optional callback function to receive network state updates
-   * @param {InitOptions}  initialisation options
-   * @returns {Promise<SAFEApp>} authenticated and connected SAFEApp
+   * @param appInfo the AppInfo
+   * @param authUri URI containing the authentication info
+   * @param networkStateCallBack optional callback function to receive network state updates
+   * @param initialisation options
+   * @returns authenticated and connected SAFEApp
    */
-  static fromAuthUri(appInfo: AppInfo, authUri: String, networkStateCallBack?: (() => any), initialisation?: InitOptions): Promise<SAFEApp>;
+  static fromAuthUri(appInfo: AppInfo, authUri: string, networkStateCallBack?: (() => any), initialisation?: InitOptions): Promise<SAFEApp>;
 
   /**
    * Returns the name of the app's own container.
-   *
-   * @returns {Promise<String>}
    */
-  getOwnContainerName(): Promise<String>;
+  getOwnContainerName(): Promise<string>;
 
   /**
    * Reconnect to the metwork
@@ -1315,23 +1049,24 @@ declare class SAFEApp {
   /**
    * Resets the object cache kept by the underlyging library.
    */
-  clearObjectCache(): void;
+  clearanyCache(): void;
 
   /**
-   * Retuns true if the underlyging library was compiled against mock-routing.
+   * @returns true if the underlyging library was compiled against mock-routing.
    */
-  isMockBuild(): void;
+  isMockBuild(): boolean;
 }
 
 /**
- * @typedef {Object} AccountInfo
  * Holds the information about the account.
- * @param {Number} mutations_done - number of mutations performed
- * with this account
- * @param {Number} mutations_available - number of remaining mutations
- * allowed for this account
  */
-type AccountInfo = Object;
+interface AccountInfo {
+  // number of mutations performed with this account
+  mutations_done: number;
+  // number of remaining mutations allowed for this account
+  mutations_available: number;
+}
+
 
 interface IERR_NO_SUCH_DATA {
   code: number;
@@ -1691,104 +1426,91 @@ declare var INVALID_SEC_KEY: IINVALID_SEC_KEY;
 
 
 /**
- * @typedef {Object} AppInfo
- * holds the information about this app, needed for authentication.
- * @param {String} id - unique identifier for the app
- *        (e.g. 'net.maidsafe.examples.mail-app')
- * @param {String} name - human readable name of the app (e.g. "Mail App")
- * @param {String} vendor - human readable name of the vendor
- *        (e.g. "MaidSafe Ltd.")
- * @param {String=} scope - an optional scope of this instance
- * @param {String=} customExecPath - an optional customised execution path
- *        to use when registering the URI with the system.
+ * Holds the information about this app, needed for authentication.
  */
-type AppInfo = Object;
+interface AppInfo {
+  // id - unique identifier for the app (e.g. 'net.maidsafe.examples.mail-app')
+  id: string;
+  // name - human readable name of the app (e.g. "Mail App")
+  name: string;
+  // vendor - human readable name of the vendor (e.g. "MaidSafe Ltd.")
+  vendor: string;
+  // scope - an optional scope of this instance
+  scope?: string;
+  // customExecPath - an optional customised execution path to use when registering the URI with the system.
+  customExecPath?: string;
+}
+
 
 /**
- * @typedef {Object} InitOptions
  * holds the additional intialisation options for the App.
- * @param {Boolean=} registerScheme to register auth scheme with the OS. Defaults to true
- * @param {Array=} joinSchemes to additionally register custom protocol schemes
- * @param {Boolean=} log to enable or disable back end logging. Defaults to true
- * @param {String=} libPath path to the folder where the native libs can
- *        be found. Defaults to current folder path.
- * @param {String=} configPath set additional search path for the config files.
- *        E.g. `log.toml` and `crust.config` files will be also searched not only
- *        in the same folder where the native library is, but also in this
- *        additional search path.
- * @param {Boolean=} forceUseMock to force the use of mock routing regardless
- *        the NODE_ENV environment variable value. Defaults to false
  */
-type InitOptions = Object;
-
+interface InitOptions {
+  // to register auth scheme with the OS. Defaults to true
+  registerScheme?: boolean;
+  // to additionally register custom protocol schemes
+  joinSchemes?: string[];
+  // to enable or disable back end logging. Defaults to true
+  log?: boolean;
+  // path to the folder where the native libs can be found. Defaults to current folder path.
+  libPath?: string;
+  // set additional search path for the config files. E.g. `log.toml` and `crust.config` files will be also searched not only in the same folder where the native library is, but also in this additional search path.
+  configPath?: string;
+  // to force the use of mock routing regardless the NODE_ENV environment variable value. Defaults to false
+  forceUseMock?: boolean;
+}
 
 /**
- * @typedef {Object} WebFetchOptions
  * holds additional options for the `webFetch` function.
- * @param {Object} range range of bytes to be retrieved.
- * The `start` attribute is expected to be the start offset, while the
- * `end` attribute of the `range` object the end position (both inclusive)
- * to be retrieved, e.g. with `range: { start: 2, end: 3 }` the 3rd
- * and 4th bytes of data will be retrieved.
- * If `end` is not specified, the bytes retrived will be from the `start` offset
- * untill the end of the file.
- * The ranges values are also used to populate the `Content-Range` and
- * `Content-Length` headers in the response.
  */
-type WebFetchOptions = Object;
+interface WebFetchOptions {
+  /**
+   * range of bytes to be retrieved.
+   * The `start` attribute is expected to be the start offset, while the `end`
+   * attribute of the `range` object the end position (both inclusive) to be
+   * retrieved, e.g. with `range: { start: 2, end: 3 }` the 3rd and 4th bytes
+   * of data will be retrieved. If `end` is not specified, the bytes retrived
+   * will be from the `start` offset untill the end of the file. The ranges
+   * values are also used to populate the `Content-Range` and `Content-Length`
+   * headers in the response.
+   */
+  range: { start: number, end: number };
+}
 
 /**
  * Helper to lookup a given `safe://`-url in accordance with the
  * convention and find the requested object.
  *
- * @param {String} url the url you want to fetch
+ * @param url the url you want to fetch
  * @param {WebFetchOptions} [options=null] additional options
- * @returns {Promise<Object>} the object with body of content and headers
+ * @returns {Promise<any>} the object with body of content and headers
  */
-declare function webFetch(url: String, options?: WebFetchOptions): Promise<Object>;
+declare function webFetch(url: string, options?: WebFetchOptions): Promise<any>;
 
 declare namespace SafeNodeApp {
   /**
    * The entry point to create a new SAFEApp
-   * @param {AppInfo} appInfo
-   * @param {Function} [networkStateCallBack=null] callback function
-   *        to receive network state updates
-   * @param {InitOptions=} options initialisation options
    *
-   * @returns {Promise<SAFEApp>} promise to a SAFEApp instance
-   * @example // Usage Example
-   * const safe = require('@maidsafe/safe-node-app');
-   *
-   * // starting initialisation
-   * let prms = safe.initialiseApp({
-   *                      id: "net.maidsafe.example",
-   *                      name: 'Example SAFE App',
-   *                      vendor: 'MaidSafe.net Ltd'
-   *                     });
-   * // we want read & insert access permissions for `_pictures` and
-   * // read access to `_videos` container:
-   * const containers = { '_videos': ['Read'], '_pictures' : ['Read', 'Insert']}
-   * prms.then(app => app.auth.genAuthUri(containers)
-   *                    .then(uri => app.auth.openUri(uri))
-   *        // now we either quit the programm
-   *        // or wait for an authorisation URI
-   *        )
+   * @param appInfo
+   * @param callback function to receive network state updates
+   * @param options initialisation options
+   * @returns promise to a SAFEApp instance
    */
   export function initializeApp(appInfo: AppInfo, networkStateCallBack?: (() => any), options?: InitOptions): Promise<SAFEApp>;
 
   /**
-   * If you have received a response URI (which you are allowed
-   * to store securely), you can directly get an authenticated or non-authenticated
+   * If you have received a response URI (which you are allowed to store
+   * securely), you can directly get an authenticated or non-authenticated
    * connection by using this helper function. Just provide said URI as the
    * second value.
-   * @param {AppInfo} appInfo - the app info
-   * @param {String} authUri - the URI coming back from the Authenticator
-   * @param {Function} [networkStateCallBack=null] optional callback function
-   * to receive network state updates
-   * @param {InitOptions=} options initialisation options
-   * @returns {Promise<SAFEApp>} promise to a SAFEApp instance
+   *
+   * @param appInfo the app info
+   * @param authUri the URI coming back from the Authenticator
+   * @param optional callback function to receive network state updates
+   * @param options initialisation options
+   * @returns promise to a SAFEApp instance
    */
-  export function fromAuthURI(appInfo: AppInfo, authUri: String, networkStateCallBack?: (() => any), options?: InitOptions): Promise<SAFEApp>;
+  export function fromAuthURI(appInfo: AppInfo, authUri: string, networkStateCallBack?: (() => any), options?: InitOptions): Promise<SAFEApp>;
 
   export enum CONSTANTS {
     NFS_FILE_MODE_OVERWRITE = 1,
