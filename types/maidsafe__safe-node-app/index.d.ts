@@ -1,5 +1,147 @@
 declare module '@maidsafe/safe-node-app' {
-  export = SafeNodeApp
+  export = SafeNodeApp;
+}
+
+declare module '@maidsafe/safe-node-app/src/error_const' {
+  interface CodeError extends Error {
+    code: number;
+  }
+
+  /**
+   * Thrown natively when data not found on network.
+   */
+  export const ERR_NO_SUCH_DATA: CodeError;
+
+  /**
+   * Thrown natively when entry on found in MutableData.
+   */
+  export const ERR_NO_SUCH_ENTRY: CodeError;
+
+  /**
+   * Thrown natively when NFS-style file not found.
+   */
+  export const ERR_FILE_NOT_FOUND: CodeError;
+
+  /**
+   * Thrown natively when attempting to fetch partial byte range of NFS-style
+   * file that is not within the total byte range. For example, this error is
+   * thrown if a file is 10 bytes long, however a byte range of 20 is requested.
+   */
+  export const INVALID_BYTE_RANGE: CodeError;
+
+  /**
+   * Thrown when a native library fails to load and which library.
+   */
+  export const FAILED_TO_LOAD_LIB: CodeError;
+
+  /**
+   * Informs that app is not yet connected to network.
+   */
+  export const SETUP_INCOMPLETE: CodeError;
+
+  /**
+   * Informs when app info provided during initialisation is invalid.
+   */
+  export const MALFORMED_APP_INFO: CodeError;
+
+  /**
+   * Argument should be an array object.
+   */
+  export const MISSING_PERMS_ARRAY: CodeError;
+
+  /**
+   * Informs of a specific object in a share MData permissions array that is malformed.
+   */
+  export const INVALID_SHARE_MD_PERMISSION: CodeError;
+
+  /**
+   * Thrown when share MD permissions is not an array.
+   */
+  export const INVALID_PERMS_ARRAY: CodeError;
+
+  /**
+   * Please provide URL
+   */
+  export const MISSING_URL: CodeError;
+
+  /**
+   * Please provide URL in string format.
+   */
+  export const INVALID_URL: CodeError;
+
+  /**
+   * Thrown when attempting to connect without authorisation URI.
+   */
+  export const MISSING_AUTH_URI: CodeError;
+
+  /**
+   * Thrown when attempting extract granted access permissions from a URI which
+   * doesn't contain such information.
+   */
+  export const NON_AUTH_GRANTED_URI: CodeError;
+
+  /**
+   * Thrown when invalid permission is requested on container.
+   */
+  export const INVALID_PERM: CodeError;
+
+  /**
+   * Thrown when attempting to get a container without specifying name with a
+   * string.
+   */
+  export const MISSING_CONTAINER_STRING: CodeError;
+
+  /**
+   * Thrown when functions unique to testing environment are attempted  to be
+   * used.
+   */
+  export const NON_DEV: CodeError;
+
+  /**
+   * Thrown when public encryption key is not provided as necessary function
+   * argument.
+   */
+  export const MISSING_PUB_ENC_KEY: CodeError;
+
+  /**
+   * Thrown when secret encryption key is not provided as necessary function
+   * argument.
+   */
+  export const MISSING_SEC_ENC_KEY: CodeError;
+
+  /**
+   * Logger initialisation failed.
+   */
+  export const LOGGER_INIT_ERROR: CodeError;
+
+  /**
+   * Informs you when config search path has failed to set, with specific
+   * reason.
+   */
+  export const CONFIG_PATH_ERROR: CodeError;
+
+  /**
+   * Custom name used to create public or private MutableData must be 32 bytes
+   * in length.
+   */
+  export const XOR_NAME: CodeError;
+
+  /**
+   * Any string or buffer provided to private MutableData that is not 24 bytes
+   * in length will throw error.
+   */
+  export const NONCE: CodeError;
+
+  /**
+   * Tag argument when creating private or public MutableData must be a number.
+   */
+  export const TYPE_TAG_NAN: CodeError;
+
+  /**
+   * Secret encryption key of improper length is provided to custom private
+   * MutableData
+   */
+  export const INVALID_SEC_KEY: CodeError;
 }
 
 declare namespace SafeNodeApp {
@@ -39,19 +181,35 @@ declare namespace SafeNodeApp {
     MD_PERMISSION_EMPTY = 0,
   }
 
+  export const VERSION: string;
+
   /**
    * Holds the information about this app, needed for authentication.
    */
   interface AppInfo {
-    // id - unique identifier for the app (e.g. 'net.maidsafe.examples.mail-app')
+    /**
+     * unique identifier for the app (e.g. 'net.maidsafe.examples.mail-app')
+     */
     id: string;
-    // name - human readable name of the app (e.g. "Mail App")
+
+    /**
+     * human readable name of the app (e.g. "Mail App")
+     */
     name: string;
-    // vendor - human readable name of the vendor (e.g. "MaidSafe Ltd.")
+
+    /**
+     * human readable name of the vendor (e.g. "MaidSafe Ltd.")
+     */
     vendor: string;
-    // scope - an optional scope of this instance
+
+    /**
+     * an optional scope of this instance
+     */
     scope?: string;
-    // customExecPath - an optional customised execution path to use when registering the URI with the system.
+
+    /**
+     * an optional customised execution path to use when registering the URI with the system.
+     */
     customExecPath?: string;
   }
 
@@ -59,17 +217,38 @@ declare namespace SafeNodeApp {
    * holds the additional intialisation options for the App.
    */
   interface InitOptions {
-    // to register auth scheme with the OS. Defaults to true
+
+    /**
+     * to register auth scheme with the OS. Defaults to true
+     */
     registerScheme?: boolean;
-    // to additionally register custom protocol schemes
+
+    /**
+     * to additionally register custom protocol schemes
+     */
     joinSchemes?: string[];
-    // to enable or disable back end logging. Defaults to true
+
+    /**
+     * to enable or disable back end logging. Defaults to true
+     */
     log?: boolean;
-    // path to the folder where the native libs can be found. Defaults to current folder path.
+
+    /**
+     * path to the folder where the native libs can be found. Defaults to current folder path.
+     */
     libPath?: string;
-    // set additional search path for the config files. E.g. `log.toml` and `crust.config` files will be also searched not only in the same folder where the native library is, but also in this additional search path.
+
+    /**
+     * set additional search path for the config files. E.g. `log.toml` and
+     * `crust.config` files will be also searched not only in the same folder
+     * where the native library is, but also in this additional search path.
+     */
     configPath?: string;
-    // to force the use of mock routing regardless the NODE_ENV environment variable value. Defaults to false
+
+    /**
+     * to force the use of mock routing regardless the NODE_ENV environment
+     * variable value. Defaults to false
+     */
     forceUseMock?: boolean;
   }
 
@@ -94,9 +273,14 @@ declare namespace SafeNodeApp {
    * Holds the information about the account.
    */
   interface AccountInfo {
-    // number of mutations performed with this account
+    /**
+     * number of mutations performed with this account
+     */
     mutations_done: number;
-    // number of remaining mutations allowed for this account
+
+    /**
+     * number of remaining mutations allowed for this account
+     */
     mutations_available: number;
   }
 
@@ -891,16 +1075,26 @@ declare namespace SafeNodeApp {
    * Holds the informatation of a value of a MutableData
    */
   interface ValueVersion {
-    // the buffer with the value
+    /**
+     * the buffer with the value
+     */
     buf: Buffer;
-    // the version
+
+    /**
+     * the version
+     */
     version: Buffer;
   }
 
   interface NameAndTag {
-    // the XoR-name/address on the network
+    /**
+     * the XoR-name/address on the network
+     */
     name: Buffer;
-    // the type tag
+
+    /**
+     * the type tag
+     */
     typeTag: number;
   }
 
