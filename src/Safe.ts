@@ -41,7 +41,7 @@ ipc.config.silent = true;
     uri = await ipcReceive(String(process.pid));
   }
 
-  return await Safe.fromAuthURI(info, uri, null, options);
+  return await Safe.fromAuthURI(info, uri, undefined, options);
 };
 
 export default Safe;
@@ -63,7 +63,7 @@ async function authorise(
     '--uri',
   ];
 
-  const app = await Safe.initializeApp(info, null, options);
+  const app = await Safe.initializeApp(info, undefined, options);
   const uri = await app.auth.genAuthUri(permissions, opts);
 
   await app.auth.openUri(uri.uri);
