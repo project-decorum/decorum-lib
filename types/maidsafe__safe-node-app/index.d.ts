@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 declare module '@maidsafe/safe-node-app/src/api/emulations/nfs' {
   import { MutableData } from '@maidsafe/safe-node-app/src/api/mutable';
   import { CONSTANTS } from '@maidsafe/safe-node-app';
@@ -46,12 +48,12 @@ declare module '@maidsafe/safe-node-app/src/api/emulations/nfs' {
      * @param position
      * @param len
      */
-    read(position: (number | CONSTANTS.MD_ENTRIES_EMPTY), len: (number | CONSTANTS.NFS_FILE_END)): Promise<[Buffer, number]>;
+    read(position: number | CONSTANTS.MD_ENTRIES_EMPTY, len: number | CONSTANTS.NFS_FILE_END): Promise<[Buffer, number]>;
 
     /**
      * Write file
      */
-    write(content: (Buffer | string)): Promise<void>;
+    write(content: Buffer | string): Promise<void>;
 
     /**
      * Close file
@@ -79,7 +81,7 @@ declare module '@maidsafe/safe-node-app/src/api/emulations/nfs' {
      * @param content file contents
      * @returns  a newly created file
      */
-    create(content: (string | Buffer)): NfsFile;
+    create(content: string | Buffer): NfsFile;
 
     /**
      * Find the file of the given filename (aka keyName in the MutableData)
@@ -98,7 +100,7 @@ declare module '@maidsafe/safe-node-app/src/api/emulations/nfs' {
      * @param userMetadata
      * @returns the same file
      */
-    insert(fileName: (string | Buffer), file: NfsFile, userMetadata: (string | Buffer)): Promise<NfsFile>;
+    insert(fileName: string | Buffer, file: NfsFile, userMetadata?: string | Buffer): Promise<NfsFile>;
 
     /**
      * Replace a path with a new file. Directly commit to the network.
@@ -109,12 +111,12 @@ declare module '@maidsafe/safe-node-app/src/api/emulations/nfs' {
      * @param userMetadata - optional parameter for updating user metadata
      * @returns the same file
      */
-    update(fileName: (string | Buffer), file: NfsFile, version: number, userMetadata: (string | Buffer)): Promise<NfsFile>;
+    update(fileName: string | Buffer, file: NfsFile, version: number, userMetadata: string | Buffer): Promise<NfsFile>;
 
     /**
      * Delete a file from path. Directly commit to the network.
      */
-    delete(fileName: (string | Buffer), version: number): Promise<void>;
+    delete(fileName: string | Buffer, version: number): Promise<void>;
 
     /**
      * Open a file for reading or writing.
@@ -129,7 +131,7 @@ declare module '@maidsafe/safe-node-app/src/api/emulations/nfs' {
      * @param NfsFile Defaults to NFS_FILE_MODE_OVERWRITE.
      * @returns {Promise<NfsFile>}
      */
-    open(file: NfsFile, openMode?: (number | CONSTANTS.NFS_FILE_MODE_OVERWRITE | CONSTANTS.NFS_FILE_MODE_APPEND | CONSTANTS.NFS_FILE_MODE_READ)): Promise<NfsFile>;
+    open(file: NfsFile, openMode?: number | CONSTANTS.NFS_FILE_MODE_OVERWRITE | CONSTANTS.NFS_FILE_MODE_APPEND | CONSTANTS.NFS_FILE_MODE_READ): Promise<NfsFile>;
   }
 }
 
@@ -291,7 +293,7 @@ declare module '@maidsafe/safe-node-app/src/app' {
      * @param initialisation options
      * @returns authenticated and connected SAFEApp
      */
-    static fromAuthUri(appInfo: AppInfo, authUri: string, networkStateCallBack?: (() => any), initialisation?: InitOptions): Promise<SAFEApp>;
+    static fromAuthUri(appInfo: AppInfo, authUri: string, networkStateCallBack?: () => any, initialisation?: InitOptions): Promise<SAFEApp>;
 
     /**
      * Returns the name of the app's own container.
@@ -353,7 +355,7 @@ declare module '@maidsafe/safe-node-app/src/api/immutable' {
      *
      * @param data The string or buffer to write
      */
-    write(data: (string | Buffer)): Promise<void>;
+    write(data: string | Buffer): Promise<void>;
 
     /**
      * Close and write the immutable Data to the network.
@@ -417,7 +419,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param signKey The key to lookup for. Defaults to USER_ANYONE.
      * @returns the permission set for that key
      */
-    getPermissionSet(signKey?: (PubSignKey | CONSTANTS.USER_ANYONE)): Promise<any>;
+    getPermissionSet(signKey?: PubSignKey | CONSTANTS.USER_ANYONE): Promise<any>;
 
     /**
      * Insert a new permission set mapped to a specifc key. Directly commits to
@@ -427,7 +429,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param permissionSet The permission set to insert.
      * @returns once finished
      */
-    insertPermissionSet(signKey: (PubSignKey | CONSTANTS.USER_ANYONE), permissionSet: any): Promise<void>;
+    insertPermissionSet(signKey: PubSignKey | CONSTANTS.USER_ANYONE, permissionSet: any): Promise<void>;
 
     /**
      * Return the list of all associated permission sets.
@@ -453,7 +455,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param value the value you want to insert
      * @returns resolves once the storing is done
      */
-    insert(keyName: (string | Buffer), value: (string | Buffer)): Promise<void>;
+    insert(keyName: string | Buffer, value: string | Buffer): Promise<void>;
 
     /**
      * Store a new `Delete`-Action in the transaction to delete an existing entry.
@@ -462,7 +464,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param version the version successor, to confirm you are actually asking for the right version
      * @returns resolves once the storing is done
      */
-    delete(keyName: (string | Buffer), version: number): Promise<void>;
+    delete(keyName: string | Buffer, version: number): Promise<void>;
 
     /**
      * Store a `Update`-Action in the transaction to update an existing entry.
@@ -472,7 +474,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param version the version successor, to confirm you are actually asking for the right version
      * @returns resolves once the storing is done
      */
-    update(keyName: (string | Buffer), value: (string | Buffer), version: number): Promise<void>;
+    update(keyName: string | Buffer, value: string | Buffer, version: number): Promise<void>;
 
   }
 
@@ -511,7 +513,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param value the data you want to store
      * @returns resolves once storing is done
      */
-    insert(keyName: (string | Buffer), value: (string | Buffer)): Promise<void>;
+    insert(keyName: string | Buffer, value: string | Buffer): Promise<void>;
 
     /**
      * Create a new mutation transaction for the entries
@@ -567,7 +569,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param  description a detailed description for the MutableData content
      * @returns self
      */
-    quickSetup(data: any, name: (string | Buffer), description: (string | Buffer)): Promise<MutableData>;
+    quickSetup(data: any, name?: string | Buffer, description?: string | Buffer): Promise<MutableData>;
 
     /**
      * Set the metadata information in the MutableData. Note this can be used only
@@ -583,7 +585,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param description a detailed description for the MutableData content
      * @returns resolves once finished
      */
-    setMetadata(name: (string | Buffer), description: (string | Buffer)): Promise<void>;
+    setMetadata(name: string | Buffer, description: string | Buffer): Promise<void>;
 
     /**
      * Encrypt the entry key provided as parameter with the encryption key contained
@@ -593,7 +595,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param key the key you want to encrypt
      * @returns the encrypted entry key
      */
-    encryptKey(key: (string | Buffer)): Promise<Buffer>;
+    encryptKey(key: string | Buffer): Promise<Buffer>;
 
     /**
      * Encrypt the entry value provided as parameter with the encryption key
@@ -603,7 +605,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param value the data you want to encrypt
      * @returns the encrypted entry value
      */
-    encryptValue(value: (string | Buffer)): Promise<Buffer>;
+    encryptValue(value: string | Buffer): Promise<Buffer>;
 
     /**
      * Decrypt the entry key/value provided as parameter with the encryption key
@@ -612,7 +614,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param value the data you want to decrypt
      * @returns the decrypted value
      */
-    decrypt(value: (string | Buffer)): Promise<Buffer>;
+    decrypt(value: string | Buffer): Promise<Buffer>;
 
     /**
      * Look up the name and tag of the MutableData as required to look it up on
@@ -642,13 +644,13 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param permissions the permissions to create the mutable data with
      * @param  entries data entries to create the mutable data with
      */
-    put(permissions: (Permissions | CONSTANTS.MD_PERMISSION_EMPTY), entries: (Entries | CONSTANTS.MD_ENTRIES_EMPTY)): Promise<void>;
+    put(permissions: Permissions | CONSTANTS.MD_PERMISSION_EMPTY, entries: Entries | CONSTANTS.MD_ENTRIES_EMPTY): Promise<void>;
 
     /**
      * Get a Handle to the entries associated with this MutableData
      * @returns the entries representation object
      */
-    getEntries(): Promise<(Entries)>;
+    getEntries(): Promise<Entries>;
 
     /**
      * Get a list with the keys contained in this MutableData
@@ -666,7 +668,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * Get a Handle to the permissions associated with this mutableData
      * @returns the permissions representation object
      */
-    getPermissions(): Promise<(Permissions)>;
+    getPermissions(): Promise<Permissions>;
 
     /**
      * Get a Handle to the permissions associated with this MutableData for a
@@ -675,7 +677,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param signKey the key to look up. Defaults to USER_ANYONE.
      * @returns the permissions set associated to the key
      */
-    getUserPermissions(signKey: (PubSignKey | CONSTANTS.USER_ANYONE)): Promise<(Permissions)>;
+    getUserPermissions(signKey: PubSignKey | CONSTANTS.USER_ANYONE): Promise<Permissions>;
 
     /**
      * Delete the permissions of a specifc key. Directly commits to the network.
@@ -685,7 +687,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param version the version successor, to confirm you are actually asking for the right one
      * @returns once finished
      */
-    delUserPermissions(signKey: (PubSignKey | CONSTANTS.USER_ANYONE), version: number): Promise<void>;
+    delUserPermissions(signKey: PubSignKey | CONSTANTS.USER_ANYONE, version: number): Promise<void>;
 
     /**
      * Set the permissions of a specifc key. Directly commits to the network.
@@ -696,7 +698,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      * @param version the version successor, to confirm you are actually asking for the right one
      * @returns resolves once finished
      */
-    setUserPermissions(signKey: (PubSignKey | CONSTANTS.USER_ANYONE), permissionSet: any, version: number): Promise<void>;
+    setUserPermissions(signKey: PubSignKey | CONSTANTS.USER_ANYONE, permissionSet: any, version: number): Promise<void>;
 
     /**
      * Commit the transaction to the network
@@ -711,7 +713,7 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      *
      * @returns the serialilsed version of the MutableData
      */
-    serialise(): Promise<(string)>;
+    serialise(): Promise<string>;
 
     /**
      * Get serialised size of current MutableData
@@ -756,14 +758,14 @@ declare module '@maidsafe/safe-node-app/src/api/mutable' {
      *
      * @param typeTag the typeTag to use
      */
-    newPrivate(name: (Buffer | string), typeTag: number, secKey: (Buffer | string), nonce: (Buffer | string)): Promise<MutableData>;
+    newPrivate(name: Buffer | string, typeTag: number, secKey: Buffer | string, nonce: Buffer | string): Promise<MutableData>;
 
     /**
      * Initiate a mutuable data at the given address with public access.
      *
      * @param typeTag the typeTag to use
      */
-    newPublic(name: (Buffer | string), typeTag: number): Promise<MutableData>;
+    newPublic(name: Buffer | string, typeTag: number): Promise<MutableData>;
 
     /**
      * Create a new Permissions object.
@@ -872,7 +874,7 @@ declare module '@maidsafe/safe-node-app/src/api/auth' {
      * @param name name of the container, e.g. `'_public'`
      * @param permissions permissions to check for ('Read' by default)
      */
-    canAccessContainer(name: string, permissions?: (string | string[])): Promise<boolean>;
+    canAccessContainer(name: string, permissions?: string | string[]): Promise<boolean>;
 
     /**
      * Lookup and return the information necessary to access a container.
@@ -1239,7 +1241,7 @@ declare module '@maidsafe/safe-node-app' {
    * @param options initialisation options
    * @returns promise to a SAFEApp instance
    */
-  export function initializeApp(appInfo: AppInfo, networkStateCallBack?: (() => any), options?: InitOptions): Promise<SAFEApp>;
+  export function initializeApp(appInfo: AppInfo, networkStateCallBack?: () => any, options?: InitOptions): Promise<SAFEApp>;
 
   /**
    * If you have received a response URI (which you are allowed to store
@@ -1253,7 +1255,7 @@ declare module '@maidsafe/safe-node-app' {
    * @param options initialisation options
    * @returns promise to a SAFEApp instance
    */
-  export function fromAuthURI(appInfo: AppInfo, authUri: string, networkStateCallBack?: (() => any), options?: InitOptions): Promise<SAFEApp>;
+  export function fromAuthURI(appInfo: AppInfo, authUri: string, networkStateCallBack?: () => any, options?: InitOptions): Promise<SAFEApp>;
 
   export enum CONSTANTS {
     NFS_FILE_MODE_OVERWRITE = 1,
