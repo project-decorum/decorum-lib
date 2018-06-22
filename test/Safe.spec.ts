@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import Safe from '../src/Safe';
+import * as Safe from '../src/Safe';
 import * as path from 'path';
 import * as process from 'process';
 

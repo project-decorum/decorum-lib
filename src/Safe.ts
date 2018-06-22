@@ -3,12 +3,17 @@ import * as ipc from 'node-ipc';
 import * as path from 'path';
 import * as yargs from 'yargs';
 import * as Safe from '@maidsafe/safe-node-app';
+import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 
 // No stdout from node-ipc
 ipc.config.silent = true;
 
 
-Safe.bootstrap = async (info: any, permissions: any = {}, opts: any = {}, execPath?: string[]) => {
+export * from '@maidsafe/safe-node-app';
+
+export async function bootstrap(
+  info: any, permissions: any = {}, opts: any = {}, execPath?: string[]
+): Promise<SAFEApp> {
   const options = {
     libPath: get_lib_path(),
   };
@@ -41,10 +46,8 @@ Safe.bootstrap = async (info: any, permissions: any = {}, opts: any = {}, execPa
     uri = await ipcReceive(String(process.pid));
   }
 
-  return await Safe.fromAuthURI(info, uri, null, options);
-};
-
-export default Safe;
+  return await Safe.fromAuthURI(info, uri, undefined, options);
+}
 
 async function authorise(
   pid: number,
@@ -63,7 +66,7 @@ async function authorise(
     '--uri',
   ];
 
-  const app = await Safe.initializeApp(info, null, options);
+  const app = await Safe.initializeApp(info, undefined, options);
   const uri = await app.auth.genAuthUri(permissions, opts);
 
   await app.auth.openUri(uri.uri);

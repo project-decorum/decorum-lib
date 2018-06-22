@@ -1,3 +1,4 @@
 export { default } from './Decorum';
 
-export { default as Safe } from './Safe';
+import * as Safe from './Safe';
+export { Safe };
