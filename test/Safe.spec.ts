@@ -25,7 +25,7 @@ describe('Safe', function() {
 
     const app = await Safe.bootstrap(info, permissions, opts, [
       process.argv[0],
-      path.join(process.cwd(), 'dist/test/bootstrap.js'),
+      path.join(process.cwd(), 'test/bootstrap.js'),
     ]);
 
     const md = await app.auth.getOwnContainer();
@@ -52,7 +52,7 @@ describe('Safe', function() {
 
     const app = await Safe.bootstrap(info, permissions, opts, [
       process.argv[0],
-      path.join(process.cwd(), 'dist/test/bootstrap.js'),
+      path.join(process.cwd(), 'test/bootstrap.js'),
     ]);
 
     const md = await app.auth.getContainer('apps/' + rand);

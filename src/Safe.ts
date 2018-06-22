@@ -12,7 +12,10 @@ ipc.config.silent = true;
 export * from '@maidsafe/safe-node-app';
 
 export async function bootstrap(
-  info: any, permissions: any = {}, opts: any = {}, execPath?: string[]
+  info?: any,
+  permissions: any = {},
+  opts: any = {},
+  execPath?: string[],
 ): Promise<SAFEApp> {
   const options = {
     libPath: get_lib_path(),

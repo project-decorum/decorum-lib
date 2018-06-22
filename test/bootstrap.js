@@ -1,4 +1,4 @@
-import Safe from '../src/Safe';
+const Safe = require('../dist').Safe;
 
 (async () => {
   await Safe.bootstrap();
