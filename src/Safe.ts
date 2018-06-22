@@ -3,6 +3,7 @@ import * as ipc from 'node-ipc';
 import * as path from 'path';
 import * as yargs from 'yargs';
 import * as Safe from '@maidsafe/safe-node-app';
+import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 
 // No stdout from node-ipc
 ipc.config.silent = true;
@@ -10,7 +11,9 @@ ipc.config.silent = true;
 
 export * from '@maidsafe/safe-node-app';
 
-export async function bootstrap(info: any, permissions: any = {}, opts: any = {}, execPath?: string[]) {
+export async function bootstrap(
+  info: any, permissions: any = {}, opts: any = {}, execPath?: string[]
+): Promise<SAFEApp> {
   const options = {
     libPath: get_lib_path(),
   };

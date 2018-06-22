@@ -1,5 +1,6 @@
 import * as Safe from '@maidsafe/safe-node-app';
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
+import { MutableData } from '@maidsafe/safe-node-app/src/api/mutable';
 
 const info = {
   id: 'decorum.lib',
@@ -72,7 +73,7 @@ export default class Decorum {
    *
    * @param nickname
    */
-  public async createIdentity(nickname: string) {
+  public async createIdentity(nickname: string): Promise<MutableData> {
     const entries = await this.app.mutableData.newEntries();
     await entries.insert('nickname', nickname);
 

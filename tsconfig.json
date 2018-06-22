@@ -8,10 +8,6 @@
     "sourceMap": true,
     "strict": true,
     "target": "ES2017",
-    "typeRoots": [
-      "./types",
-      "./node_modules/@types"
-    ]
   },
   "include": [
     "src/**/*"
