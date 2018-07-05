@@ -1,11 +1,5 @@
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import * as h from './helpers';
 
-// Copy pre-setup MockVault to be used during testing
-fs.copyFileSync(
-  path.join(__dirname, 'assets/MockVault'),
-  path.join(os.tmpdir(), 'MockVault'),
-);
+h.copy_vault();
 
 import './Decorum.spec';

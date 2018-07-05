@@ -1,9 +1,8 @@
 import { assert } from 'chai';
+import * as h from './helpers';
 
 import Decorum from '../src/Decorum';
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
-import * as Safe from '@maidsafe/safe-node-app';
-const MockVault = require('./assets/MockVault.json');
 
 const NICKNAME = 'Test Identity';
 
@@ -31,8 +30,7 @@ describe('Decorum with pre-existing app', () => {
   let app: SAFEApp;
 
   before(async () => {
-    app = await Safe.initializeApp(MockVault['decorum.lib'].info);
-    await app.auth.loginFromURI(MockVault['decorum.lib'].uri);
+    app = await h.get_app('decorum.lib');
   });
 
   it('has access', async () => {
