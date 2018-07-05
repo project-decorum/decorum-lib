@@ -11,6 +11,14 @@ ipc.config.silent = true;
 
 export * from '@maidsafe/safe-node-app';
 
+/**
+ * Use IPC to communicate URI to current process to authorise app.
+ *
+ * @param info
+ * @param permissions
+ * @param opts
+ * @param execPath
+ */
 export async function bootstrap(
   info?: any,
   permissions: any = {},

@@ -38,7 +38,7 @@ export default class Decorum {
    *
    * @param app  An app instance.
    */
-  constructor(app: any) {
+  constructor(app: SAFEApp) {
     this.app = app;
   }
 
