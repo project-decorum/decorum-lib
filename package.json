@@ -12,8 +12,8 @@
   "scripts": {
     "build": "tsc",
     "docs": "typedoc src",
-    "test": "cross-env NODE_ENV=dev nyc mocha test/index.ts",
-    "test:auth": "npm run build && cross-env NODE_ENV=dev nyc mocha test/index-auth.ts"
+    "test": "cross-env NODE_ENV=testing nyc mocha test/index.ts",
+    "test:auth": "npm run build && cross-env NODE_ENV=testing nyc mocha test/index-auth.ts"
   },
   "devDependencies": {
     "@types/chai": "^4.1.3",
