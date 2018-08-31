@@ -25,7 +25,7 @@ export default class Decorum {
    * @returns {Decorum}
    */
   public static async initialise() {
-    const app = await Safe.initializeApp(info);
+    const app = await Safe.initialiseApp(info);
 
     return new this(app);
   }
@@ -60,7 +60,7 @@ export default class Decorum {
   public async login(authUri?: string) {
     /* istanbul ignore if */
     if (authUri !== undefined) {
-      await this.app.auth.loginFromURI(authUri);
+      await this.app.auth.loginFromUri(authUri);
     } else {
       await this.app.auth.loginForTest(permissions, opts);
     }

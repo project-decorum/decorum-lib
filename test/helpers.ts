@@ -21,8 +21,8 @@ export function copy_vault() {
  * @param id App ID.
  */
 export async function get_app(id: string) {
-  const app = await Safe.initializeApp(mock[id].info);
-  await app.auth.loginFromURI(mock[id].uri);
+  const app = await Safe.initialiseApp(mock[id].info);
+  await app.auth.loginFromUri(mock[id].uri);
 
   return app;
 }

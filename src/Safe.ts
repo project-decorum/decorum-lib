@@ -57,7 +57,7 @@ export async function bootstrap(
     uri = await ipcReceive(String(process.pid));
   }
 
-  return await Safe.fromAuthURI(info, uri, undefined, options);
+  return await Safe.fromAuthUri(info, uri, undefined, options);
 }
 
 async function authorise(
@@ -77,7 +77,7 @@ async function authorise(
     '--uri',
   ];
 
-  const app = await Safe.initializeApp(info, undefined, options);
+  const app = await Safe.initialiseApp(info, undefined, options);
   const uri = await app.auth.genAuthUri(permissions, opts);
 
   await app.auth.openUri(uri.uri);
