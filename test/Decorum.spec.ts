@@ -5,6 +5,7 @@ import Decorum from '../src/Decorum';
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 
 const NICKNAME = 'Test Identity';
+const TYPE_TAG = 16048;
 
 describe('Decorum', () => {
   let decorum: Decorum;
@@ -35,5 +36,20 @@ describe('Decorum with pre-existing app', () => {
 
   it('has access', async () => {
     assert.isTrue(await app.auth.canAccessContainer('apps/decorum.lib.id-1', ['Read']));
+  });
+
+  it.only('does stuff', async () => {
+    const profile = {
+      uri: 'safe://mywebid.gabriel',
+      name: 'Gabriel Viganotti',
+      nick: 'bochaco',
+      website: 'safe://mywebsite.gabriel',
+      image: 'safe://mywebsite.gabriel/images/myavatar',
+    };
+
+    const md = await app.mutableData.newRandomPublic(TYPE_TAG);
+    await md.quickSetup({});
+    const webId = await md.emulateAs('WebID');
+    await webId.create(profile);
   });
 });
