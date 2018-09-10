@@ -37,6 +37,7 @@ export default class Decorum {
     const md = await this.app.mutableData.fromSerial(vv.buf);
 
     const rdf = md.emulateAs('RDF');
+    await rdf.nowOrWhenFetched();
 
     rdf.setId('list');
     rdf.add(rdf.sym('safe://example.com/myid'), rdf.sym('http://xmlns.com/foaf/0.1/knows'), rdf.literal(name));

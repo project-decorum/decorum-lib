@@ -14,13 +14,15 @@ describe('Decorum', () => {
     await decorum.initialise();
   });
 
-  it('adds contact', async () => {
+  it('adds contacts', async () => {
     await decorum.addContact('myid.test');
+    await decorum.addContact('anid.test');
   });
 
   it('lists contacts', async () => {
     const contacts = await decorum.getContacts();
 
     assert.include(contacts, 'myid.test');
+    assert.include(contacts, 'anid.test');
   });
 });
