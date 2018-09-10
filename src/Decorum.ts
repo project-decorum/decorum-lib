@@ -2,34 +2,7 @@ import * as Safe from '@maidsafe/safe-node-app';
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 import { MutableData } from '@maidsafe/safe-node-app/src/api/mutable';
 
-const info = {
-  id: 'decorum.lib',
-  name: 'Decorum Core Library',
-  vendor: 'Project Decorum',
-};
-
-const permissions = {};
-
-const opts = {
-  own_container: true,
-};
-
-const TYPES = {
-  IDENTITY: 5487,
-};
-
 export default class Decorum {
-  /**
-   * Initialise the Decorum object.
-   *
-   * @returns {Decorum}
-   */
-  public static async initialise() {
-    const app = await Safe.initialiseApp(info);
-
-    return new this(app);
-  }
-
   // The underlying app handle object.
   public app: SAFEApp;
 
@@ -42,44 +15,50 @@ export default class Decorum {
     this.app = app;
   }
 
-  /* istanbul ignore next */
-  /**
-   * Request authorisation from the user
-   *
-   * @return {string} authorisation URI
-   */
-  public async authorise() {
-    return await this.app.auth.genAuthUri(permissions, opts);
+  public async initialise() {
+    // Create contact list MD
+    const md = await this.app.mutableData.newRandomPublic(1);
+    await md.quickSetup({});
+    const serial = await md.serialise();
+
+    // Put reference to contact list in own container
+    const cont = await this.app.auth.getOwnContainer();
+    const entries = await cont.getEntries();
+    const mutation = await entries.mutate();
+    await mutation.insert('contacts', serial);
+
+    await cont.applyEntriesMutation(mutation);
   }
 
-  /**
-   * Login
-   *
-   * @return {Decorum}
-   */
-  public async login(authUri?: string) {
-    /* istanbul ignore if */
-    if (authUri !== undefined) {
-      await this.app.auth.loginFromUri(authUri);
-    } else {
-      await this.app.auth.loginForTest(permissions, opts);
-    }
+  public async addContact(name: string) {
+    // Get contact list MD from own container
+    const cont = await this.app.auth.getOwnContainer();
+    const vv = await cont.get('contacts');
+    const md = await this.app.mutableData.fromSerial(vv.buf);
 
-    return this;
+    const rdf = md.emulateAs('RDF');
+
+    rdf.setId('list');
+    rdf.add(rdf.sym('safe://example.com/myid'), rdf.sym('http://xmlns.com/foaf/0.1/knows'), rdf.literal(name));
+
+    await rdf.commit();
   }
 
-  /**
-   * Create new identity.
-   *
-   * @param nickname
-   */
-  public async createIdentity(nickname: string): Promise<MutableData> {
-    const entries = await this.app.mutableData.newEntries();
-    await entries.insert('nickname', nickname);
+  public async getContacts() {
+    // Get contact list MD from own container
+    const cont = await this.app.auth.getOwnContainer();
+    const vv = await cont.get('contacts');
+    const md = await this.app.mutableData.fromSerial(vv.buf);
 
-    const md = await this.app.mutableData.newRandomPublic(TYPES.IDENTITY);
-    await md.put(Safe.CONSTANTS.MD_PERMISSION_EMPTY, entries);
+    const rdf = md.emulateAs('RDF');
+    await rdf.nowOrWhenFetched();
 
-    return md;
+    const contacts = rdf.each(
+      rdf.sym('safe://example.com/myid'),
+      rdf.sym('http://xmlns.com/foaf/0.1/knows'),
+      undefined,
+    );
+
+    return contacts.map((c: any) => c.value);
   }
 }
