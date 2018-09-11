@@ -14,19 +14,20 @@ describe('Decorum', () => {
     await decorum.initialise();
   });
 
-  it('create WebID', async () => {
+  it('create WebIDs', async () => {
     await decorum.createWebID('safe://myid.test', 'John Doe', 'Johnny');
+    await decorum.createWebID('safe://anid.heyo', 'Jan Smit', 'Jantje');
   });
 
   it('adds contacts', async () => {
     await decorum.addContact('myid.test');
-    await decorum.addContact('anid.test');
+    await decorum.addContact('anid.heyo');
   });
 
   it('lists contacts', async () => {
     const contacts = await decorum.getContacts();
 
     assert.include(contacts, 'myid.test');
-    assert.include(contacts, 'anid.test');
+    assert.include(contacts, 'anid.heyo');
   });
 });

@@ -33,7 +33,7 @@
     "typescript": "^2.9.1"
   },
   "dependencies": {
-    "@maidsafe/safe-node-app": "git+https://github.com/joshuef/safe_app_nodejs#6358348c1bc118b0e39a70ac0cf657f48b89ef0c",
+    "@maidsafe/safe-node-app": "git+https://github.com/maidsafe/safe_app_nodejs#338ec368e25eb2e258d2447413006d74ecc23a15",
     "node-ipc": "^9.1.1",
     "yargs": "^11.1.0"
   },
