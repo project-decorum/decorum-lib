@@ -16,6 +16,7 @@ install:
 
 before_deploy:
   - npm run docs
+  - npm run build
 deploy:
   - provider: pages
     skip-cleanup: true
@@ -26,5 +27,6 @@ deploy:
   - provider: npm
     email: "bzeeman@live.nl"
     api_key: $NPM_TOKEN
+    skip_cleanup: true
     on:
       tags: true

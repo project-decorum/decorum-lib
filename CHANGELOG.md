@@ -5,6 +5,12 @@ This project uses [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html
 ## [Unreleased]
 
 
+## [0.2.1]
+### Changed
+- Fixed up SAFE API types dependency
+- Travis: build project before deploying to NPM
+
+
 ## [0.2.0]
 ### Added
 - Test Decorum with pre-built MockVault
