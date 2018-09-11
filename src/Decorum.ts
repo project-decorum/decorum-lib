@@ -1,6 +1,4 @@
-import * as Safe from '@maidsafe/safe-node-app';
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
-import { MutableData } from '@maidsafe/safe-node-app/src/api/mutable';
 
 export default class Decorum {
   // The underlying app handle object.
@@ -17,7 +15,7 @@ export default class Decorum {
 
   public async initialise() {
     // Create contact list MD
-    const md = await this.app.mutableData.newRandomPublic(1);
+    const md = await this.app.mutableData.newRandomPublic(1); // TODO: type tag
     await md.quickSetup({});
     const serial = await md.serialise();
 
@@ -28,6 +26,16 @@ export default class Decorum {
     await mutation.insert('contacts', serial);
 
     await cont.applyEntriesMutation(mutation);
+  }
+
+  public async createWebID(uri: string, name: string, nick: string) {
+    const profile = { uri, name, nick };
+
+    const md = await this.app.mutableData.newRandomPublic(2); // TODO: type tag
+    await md.quickSetup({});
+
+    const webId = await md.emulateAs('WebID');
+    await webId.create(profile);
   }
 
   public async addContact(name: string) {

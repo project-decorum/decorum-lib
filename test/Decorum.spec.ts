@@ -14,6 +14,10 @@ describe('Decorum', () => {
     await decorum.initialise();
   });
 
+  it('create WebID', async () => {
+    await decorum.createWebID('safe://myid.test', 'John Doe', 'Johnny');
+  });
+
   it('adds contacts', async () => {
     await decorum.addContact('myid.test');
     await decorum.addContact('anid.test');
