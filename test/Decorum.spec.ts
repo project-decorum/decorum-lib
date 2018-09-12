@@ -16,6 +16,7 @@ describe('Decorum', () => {
 
   it('create WebIDs', async () => {
     await decorum.createWebID('safe://myid.test', 'John Doe', 'Johnny');
+    await decorum.createWebID('safe://cook.test', 'Liz Cook', 'Lizzie');
     await decorum.createWebID('safe://anid.heyo', 'Jan Smit', 'Jantje');
   });
 
@@ -29,5 +30,14 @@ describe('Decorum', () => {
 
     assert.include(contacts, 'myid.test');
     assert.include(contacts, 'anid.heyo');
+  });
+
+  it('lists WebIDs', async () => {
+    const ids = await decorum.getWebIDs();
+
+    assert.include(ids, 'safe://myid.test');
+    assert.include(ids, 'safe://cook.test');
+    assert.include(ids, 'safe://anid.heyo');
+    assert.lengthOf(ids, 3);
   });
 });

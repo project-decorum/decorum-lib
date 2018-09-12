@@ -38,6 +38,23 @@ export default class Decorum {
     await webId.create(profile);
   }
 
+  public async getWebIDs() {
+    const cont = await this.app.auth.getContainer('_public');
+
+    const rdf = cont.emulateAs('RDF');
+    // rdf.setId('safe://_public/webId');
+    await rdf.nowOrWhenFetched();
+
+
+    const ids = rdf.statementsMatching(
+      undefined,
+      rdf.sym('http://safenetwork.org/safevocab/uri'),
+      undefined,
+    );
+
+    return ids.map((i: any) => i.object.value);
+  }
+
   public async addContact(name: string) {
     // Get contact list MD from own container
     const cont = await this.app.auth.getOwnContainer();
