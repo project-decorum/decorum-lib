@@ -7,6 +7,8 @@ describe('Decorum', () => {
   let decorum: Decorum;
 
   before(async () => {
+    h.copy_vault();
+
     decorum = new Decorum(await h.get_app('decorum.lib'));
   });
 
