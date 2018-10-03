@@ -60,6 +60,14 @@ export async function bootstrap(
   return await Safe.fromAuthUri(info, uri, undefined, options);
 }
 
+export async function fromUri(app: SAFEApp, uri: string) {
+  await app.auth.openUri(uri);
+
+  const uri2 = await ipcReceive(String(process.pid));
+
+  return app.auth.loginFromUri(uri2);
+}
+
 async function authorise(
   pid: number,
   info: any,
@@ -83,7 +91,7 @@ async function authorise(
   await app.auth.openUri(uri.uri);
 }
 
-async function ipcReceive(id: string) {
+async function ipcReceive(id: string): Promise<any> {
   return await new Promise((resolve) => {
     ipc.config.id = id;
 
