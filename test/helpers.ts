@@ -5,6 +5,9 @@ import * as path from 'path';
 import * as Safe from '@maidsafe/safe-node-app';
 const mock = require('./assets/MockVault.json');
 
+// @ts-ignore
+import mock = require('./assets/MockVault.json');
+
 /**
  * Copy pre-setup mock vault to be used during testing.
  */
@@ -21,8 +24,8 @@ export function copy_vault() {
  * @param id App ID.
  */
 export async function get_app(id: string) {
-  const app = await Safe.initialiseApp(mock[id].info);
-  await app.auth.loginFromUri(mock[id].uri);
+  const app = await Safe.initialiseApp((mock as any)[id].info);
+  await app.auth.loginFromUri((mock as any)[id].uri);
 
   return app;
 }
