@@ -29,7 +29,7 @@ deploy:
     local_dir: docs/
     github-token: $GITHUB_TOKEN
     on:
-      branch: master
+      tags: true
   - provider: npm
     email: "bzeeman@live.nl"
     api_key: $NPM_TOKEN
