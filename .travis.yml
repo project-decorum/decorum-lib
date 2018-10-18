@@ -7,6 +7,12 @@ cache:
   directories:
     - node_modules
 
+addons:
+  apt:
+    packages:
+      - desktop-file-utils
+      - xdg-utils
+
 install:
   - export NODE_ENV=dev
   - npm install
