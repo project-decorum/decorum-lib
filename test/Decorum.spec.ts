@@ -6,6 +6,7 @@ describe('Decorum', () => {
   let app: SAFEApp;
 
   before(async () => {
-    app = await h.get_app('decorum.lib');
+    app = await h.get_app();
+  });
   });
 });

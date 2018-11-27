@@ -19,11 +19,9 @@ const PERMISSIONS =  {
 
 
 /**
- * Initialize a logged in app from the pre-setup mock vault.
- *
- * @param id App ID.
+ * Initialize a local logged in app.
  */
-export async function get_app(id: string) {
+export async function get_app() {
   const app = await Safe.initialiseApp(INFO, undefined, { enableExperimentalApis: true});
   await app.auth.loginForTest(PERMISSIONS);
 
