@@ -8,5 +8,4 @@ describe('Decorum', () => {
   before(async () => {
     app = await h.get_app();
   });
-  });
 });
