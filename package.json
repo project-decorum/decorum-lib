@@ -33,9 +33,10 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
-    "@maidsafe/safe-node-app": "git+https://github.com/maidsafe/safe_app_nodejs.git#338ec368e25eb2e258d2447413006d74ecc23a15",
+    "@maidsafe/safe-node-app": "git+https://github.com/maidsafe/safe_app_nodejs.git#semver:^0.10.0",
     "node-ipc": "^9.1.1",
-    "yargs": "^12.0.0"
+    "rdflib": "^0.19.1",
+    "yargs": "^12.0.5"
   },
   "files": [
     "dist"

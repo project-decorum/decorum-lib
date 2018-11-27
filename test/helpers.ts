@@ -3,20 +3,20 @@ import * as os from 'os';
 import * as path from 'path';
 
 import * as Safe from '@maidsafe/safe-node-app';
-const mock = require('./assets/MockVault.json');
+import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 
-// @ts-ignore
-import mock = require('./assets/MockVault.json');
 
-/**
- * Copy pre-setup mock vault to be used during testing.
- */
-export function copy_vault() {
-  fs.copyFileSync(
-    path.join(__dirname, 'assets/MockVault'),
-    path.join(os.tmpdir(), 'MockVault'),
-  );
-}
+const INFO = {
+  id: 'decorum.lib',
+  name: 'Decorum Core Library',
+  vendor: 'Project Decorum',
+};
+
+const PERMISSIONS =  {
+  _public: ['Read', 'Insert', 'Update', 'Delete'],
+  _publicNames: ['Read', 'Insert', 'Update', 'Delete'],
+};
+
 
 /**
  * Initialize a logged in app from the pre-setup mock vault.
@@ -24,8 +24,8 @@ export function copy_vault() {
  * @param id App ID.
  */
 export async function get_app(id: string) {
-  const app = await Safe.initialiseApp((mock as any)[id].info);
-  await app.auth.loginFromUri((mock as any)[id].uri);
+  const app = await Safe.initialiseApp(INFO, undefined, { enableExperimentalApis: true});
+  await app.auth.loginForTest(PERMISSIONS);
 
   return app;
 }
