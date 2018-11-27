@@ -15,9 +15,6 @@
       "./src/types"
     ]
   },
-  "include": [
-    "src/**/*"
-  ],
   "typedocOptions": {
     "out": "docs",
     "entryPoint": "Decorum",
