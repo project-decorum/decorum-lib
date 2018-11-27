@@ -1,4 +1,5 @@
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
+import Identity from './Identity';
 
 export default class Decorum {
   // The underlying app handle object.
@@ -12,6 +13,12 @@ export default class Decorum {
   constructor(app: SAFEApp) {
     this.app = app;
   }
+
+  public newIdentity() {
+    return new Identity(this.app);
+  }
+
+
 
   public async initialise() {
     // Create contact list MD
