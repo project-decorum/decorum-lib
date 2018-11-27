@@ -18,7 +18,10 @@ describe('Decorum', () => {
     identity.name = 'John Doe';
     await identity.commit();
 
-    assert.isNotNull(identity.url);
-    // console.log(await app.fetch(identity.url!));
+    const identity2 = dec.newIdentity();
+    identity2.xor = identity.xor;
+    await identity2.fetch();
+
+    assert.equal(identity.name, identity2.name);
   });
 });
