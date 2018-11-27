@@ -10,7 +10,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.build.json",
     "docs": "typedoc src",
     "test": "cross-env NODE_ENV=testing nyc mocha test/index.ts"
   },
