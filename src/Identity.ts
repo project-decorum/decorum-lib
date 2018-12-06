@@ -17,6 +17,8 @@ export default class Identity {
   public xor: Buffer;
   public tag: number = 0xDEC0;
 
+  public md: MutableData | undefined;
+
   public graph: any;
 
   private app: SAFEApp;
@@ -42,14 +44,16 @@ export default class Identity {
   }
 
   public async commit() {
-    const md = await this.app.mutableData.newPublic(this.xor, this.tag);
+    if (this.md === undefined) {
+      this.md = await this.app.mutableData.newPublic(this.xor, this.tag);
 
-    const perms = await this.app.mutableData.newPermissions();
-    const key = await this.app.crypto.getAppPubSignKey();
-    const set = ['Insert', 'Update', 'Delete', 'ManagePermissions'];
-    await perms.insertPermissionSet(key, set);
+      const perms = await this.app.mutableData.newPermissions();
+      const key = await this.app.crypto.getAppPubSignKey();
+      const set = ['Insert', 'Update', 'Delete', 'ManagePermissions'];
+      await perms.insertPermissionSet(key, set);
 
-    await md.put(perms, CONSTANTS.MD_ENTRIES_EMPTY);
+      await this.md.put(perms, CONSTANTS.MD_ENTRIES_EMPTY);
+    }
 
     this.graph = rdflib.graph();
 
@@ -63,16 +67,16 @@ export default class Identity {
     this.graph.add(rdflib.sym(this.url + '#me'), FOAF('name'), this.name);
 
 
-    const rdf = md.emulateAs('RDF');
+    const rdf = this.md.emulateAs('RDF');
     rdf.graphStore = this.graph;
     rdf.id = this.url;
     await rdf.commit();
   }
 
   public async fetch() {
-    const md = await this.app.mutableData.newPublic(this.xor, this.tag);
+    this.md = await this.app.mutableData.newPublic(this.xor, this.tag);
 
-    const rdf = md.emulateAs('RDF');
+    const rdf = this.md.emulateAs('RDF');
 
     await rdf.nowOrWhenFetched();
     this.graph = rdf.graphStore;
