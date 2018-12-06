@@ -7,6 +7,8 @@ export default class Identity extends RdfMd {
   public name: string | undefined;
   public nick: string | undefined;
 
+  public knows: Identity[] = [];
+
   public async commit() {
     if (this.name === undefined) {
       throw new Error('name has to be defined');
@@ -27,6 +29,10 @@ export default class Identity extends RdfMd {
       this.graph.add(rdflib.sym(this.url + '#me'), FOAF('nick'), this.nick);
     }
 
+    for (const identity of this.knows) {
+      this.graph.add(rdflib.sym(this.url + '#me'), FOAF('knows'), identity.url);
+    }
+
     // TODO: cert:key, pim:storage and foaf:Image
 
     return await super.commit();
@@ -39,5 +45,18 @@ export default class Identity extends RdfMd {
     const name = this.graph.any(rdflib.sym(this.url + '#me'), FOAF('name'), null);
 
     this.name = name.value;
+    this.knows = [];
+
+    const matches = this.graph.match(rdflib.sym(this.url + '#me'), FOAF('knows'), null);
+    for (const { object } of matches) {
+      const identity = new Identity(this.app);
+      identity.url = object.value;
+
+      this.knows.push(identity);
+    }
+  }
+
+  public async addKnows(identity: this) {
+    this.knows.push(identity);
   }
 }

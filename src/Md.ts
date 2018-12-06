@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import multihashes from 'multihashes';
 import CID from 'cids';
 
+import url from 'url';
 
 export default class Md {
   /**
@@ -38,5 +39,16 @@ export default class Md {
     const newCid = new CID(consts.CID_VERSION, consts.CID_DEFAULT_CODEC, encodedHash);
     const cidStr = newCid.toBaseEncodedString(consts.CID_BASE_ENCODING);
     return `safe://${cidStr}:${this.tag}`;
+  }
+
+  set url(safeUrl: string) {
+    const urlObject = url.parse(safeUrl);
+
+    const cid = new CID(urlObject.hostname);
+    const encodedHash = multihashes.decode(cid.multihash);
+    const address = encodedHash.digest;
+
+    this.xor = encodedHash.digest;
+    this.tag = Number(urlObject.port);
   }
 }

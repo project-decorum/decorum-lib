@@ -38,4 +38,21 @@ describe('Decorum', () => {
 
     assert.equal(identity.name, identity2.name);
   });
+
+  it('create "knows" relationship between WebIDs', async () => {
+    const john = app.newIdentity();
+    john.name = 'John Doe';
+    await john.commit();
+
+    const isaac = app.newIdentity();
+    isaac.name = 'Isaac Newton';
+    isaac.addKnows(john);
+    await isaac.commit();
+
+    await isaac.fetch();
+
+    await isaac.knows[0].fetch();
+
+    assert.equal(john.name, isaac.knows[0].name);
+  });
 });
