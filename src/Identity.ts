@@ -4,9 +4,14 @@ import rdflib from 'rdflib';
 
 
 export default class Identity extends RdfMd {
-  public name: string = '';
+  public name: string | undefined;
+  public nick: string | undefined;
 
   public async commit() {
+    if (this.name === undefined) {
+      throw new Error('name has to be defined');
+    }
+
     this.graph = rdflib.graph();
 
     const FOAF = rdflib.Namespace('https://xmlns.com/foaf/0.1/');
@@ -17,6 +22,12 @@ export default class Identity extends RdfMd {
 
     this.graph.add(rdflib.sym(this.url + '#me'), RDF('type'), FOAF('Person'));
     this.graph.add(rdflib.sym(this.url + '#me'), FOAF('name'), this.name);
+
+    if (this.nick !== undefined) {
+      this.graph.add(rdflib.sym(this.url + '#me'), FOAF('nick'), this.nick);
+    }
+
+    // TODO: cert:key, pim:storage and foaf:Image
 
     return await super.commit();
   }
