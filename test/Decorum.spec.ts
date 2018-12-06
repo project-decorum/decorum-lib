@@ -11,7 +11,7 @@ describe('Decorum', () => {
     app = await h.get_app();
   });
 
-  it('', async () => {
+  it('fetches a committed WebID', async () => {
     const dec = new Decorum(app);
 
     const identity = dec.newIdentity();

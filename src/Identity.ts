@@ -4,58 +4,52 @@ import { CONSTANTS } from '@maidsafe/safe-node-app';
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 import { MutableData } from '@maidsafe/safe-node-app/src/api/mutable';
 
+import consts from '@maidsafe/safe-node-app/src/consts';
+
+import crypto from 'crypto';
+import multihashes from 'multihashes';
+import CID from 'cids';
+
+
 export default class Identity {
   public name: string = '';
 
-  public xor: Buffer | undefined = undefined;
+  public xor: Buffer;
   public tag: number = 0xDEC0;
-  public url: string | undefined = undefined;
-
-  public md: MutableData | undefined = undefined;
 
   public graph: any;
 
   private app: SAFEApp;
 
 
-  constructor(app: SAFEApp) {
+  constructor(app: SAFEApp, xor?: Buffer) {
     this.app = app;
+
+    this.xor = xor || crypto.randomBytes(32);
   }
 
-  public async populate() {
-    if (this.md === undefined) {
-      if (this.xor === undefined) {
-        this.md = await this.app.mutableData.newRandomPublic(this.tag);
-      } else {
-        this.md = await this.app.mutableData.newPublic(this.xor, this.tag);
-      }
-    }
-
-    if (this.xor === undefined) {
-      this.xor = (await this.md.getNameAndTag()).name;
-    }
-
-    if (this.tag === undefined) {
-      this.tag = (await this.md.getNameAndTag()).typeTag;
-    }
-
-    if (this.url === undefined) {
-      this.url = (await this.md.getNameAndTag()).xorUrl;
-    }
+  /**
+   * The CID URL calculated from the XOR name and type tag.
+   *
+   * @readonly
+   * @type {string}
+   */
+  get url(): string {
+    const encodedHash = multihashes.encode(this.xor, consts.CID_HASH_FN);
+    const newCid = new CID(consts.CID_VERSION, consts.CID_DEFAULT_CODEC, encodedHash);
+    const cidStr = newCid.toBaseEncodedString(consts.CID_BASE_ENCODING);
+    return `safe://${cidStr}:${this.tag}`;
   }
 
   public async commit() {
-    await this.populate();
-
-    this.url = (await this.md!.getNameAndTag()).xorUrl;
+    const md = await this.app.mutableData.newPublic(this.xor, this.tag);
 
     const perms = await this.app.mutableData.newPermissions();
     const key = await this.app.crypto.getAppPubSignKey();
     const set = ['Insert', 'Update', 'Delete', 'ManagePermissions'];
     await perms.insertPermissionSet(key, set);
 
-    await this.md!.put(perms, CONSTANTS.MD_ENTRIES_EMPTY);
-
+    await md.put(perms, CONSTANTS.MD_ENTRIES_EMPTY);
 
     this.graph = rdflib.graph();
 
@@ -69,18 +63,16 @@ export default class Identity {
     this.graph.add(rdflib.sym(this.url + '#me'), FOAF('name'), this.name);
 
 
-    const rdf = this.md!.emulateAs('RDF');
+    const rdf = md.emulateAs('RDF');
     rdf.graphStore = this.graph;
     rdf.id = this.url;
     await rdf.commit();
-
-    this.xor = (await this.md!.getNameAndTag()).name;
   }
 
   public async fetch() {
-    await this.populate();
+    const md = await this.app.mutableData.newPublic(this.xor, this.tag);
 
-    const rdf = this.md!.emulateAs('RDF');
+    const rdf = md.emulateAs('RDF');
 
     await rdf.nowOrWhenFetched();
     this.graph = rdf.graphStore;
