@@ -1,47 +1,17 @@
+import Md from './Md';
+
 import rdflib from 'rdflib';
 
 import { CONSTANTS } from '@maidsafe/safe-node-app';
-import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 import { MutableData } from '@maidsafe/safe-node-app/src/api/mutable';
 
-import consts from '@maidsafe/safe-node-app/src/consts';
 
-import crypto from 'crypto';
-import multihashes from 'multihashes';
-import CID from 'cids';
-
-
-export default class Identity {
+export default class Identity extends Md {
   public name: string = '';
-
-  public xor: Buffer;
-  public tag: number = 0xDEC0;
 
   public md: MutableData | undefined;
 
   public graph: any;
-
-  private app: SAFEApp;
-
-
-  constructor(app: SAFEApp, xor?: Buffer) {
-    this.app = app;
-
-    this.xor = xor || crypto.randomBytes(32);
-  }
-
-  /**
-   * The CID URL calculated from the XOR name and type tag.
-   *
-   * @readonly
-   * @type {string}
-   */
-  get url(): string {
-    const encodedHash = multihashes.encode(this.xor, consts.CID_HASH_FN);
-    const newCid = new CID(consts.CID_VERSION, consts.CID_DEFAULT_CODEC, encodedHash);
-    const cidStr = newCid.toBaseEncodedString(consts.CID_BASE_ENCODING);
-    return `safe://${cidStr}:${this.tag}`;
-  }
 
   public async commit() {
     if (this.md === undefined) {
