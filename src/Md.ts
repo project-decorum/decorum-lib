@@ -30,9 +30,6 @@ export default class Md {
 
   /**
    * The CID URL calculated from the XOR name and type tag.
-   *
-   * @readonly
-   * @type {string}
    */
   get url(): string {
     const encodedHash = multihashes.encode(this.xor, consts.CID_HASH_FN);
@@ -41,6 +38,9 @@ export default class Md {
     return `safe://${cidStr}:${this.tag}`;
   }
 
+  /**
+   * Set the CID URL and derive XOR name and type tag from it.
+   */
   set url(safeUrl: string) {
     const urlObject = url.parse(safeUrl);
 

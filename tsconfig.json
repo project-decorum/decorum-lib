@@ -17,7 +17,6 @@
   },
   "typedocOptions": {
     "out": "docs",
-    "entryPoint": "Decorum",
     "mode": "file",
     "target": "ES6",
     "module": "commonjs",
