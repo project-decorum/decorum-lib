@@ -4,6 +4,8 @@ import rdflib from 'rdflib';
 
 
 export default class Identity extends RdfMd {
+  public tag = 0xDEC0;
+
   public name: string | undefined;
   public nick: string | undefined;
 

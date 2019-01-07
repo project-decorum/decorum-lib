@@ -17,15 +17,20 @@ export default class Md {
   /**
    * The tag type of the MD.
    */
-  public tag: number = 0xDEC0;
+  public tag: number;
 
 
   protected app: SAFEApp;
 
-  constructor(app: SAFEApp, xor?: Buffer) {
+  constructor(app: SAFEApp, xor?: Buffer, tag?: number) {
     this.app = app;
 
     this.xor = xor || crypto.randomBytes(32);
+    this.tag = tag || 0;
+  }
+
+  public async commit() {
+    //
   }
 
   /**
