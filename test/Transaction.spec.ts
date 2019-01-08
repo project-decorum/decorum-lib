@@ -33,7 +33,7 @@ describe('Transaction', () => {
     assert.deepEqual(u.outputs, outputs);
   });
 
-  it.only('create consecutive transaction', async () => {
+  it('create consecutive transaction', async () => {
     const [sk, pk] = await utils.generateKeyPair();
 
     const coin = crypto.randomBytes(20).toString('hex');

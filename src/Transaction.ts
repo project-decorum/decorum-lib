@@ -5,13 +5,12 @@ import { MutableData, ValueVersion } from '@maidsafe/safe-node-app/src/api/mutab
 import error_const from '@maidsafe/safe-node-app/src/error_const';
 
 
+// TODO: encrypt the MD.
 export default class Transaction extends Md {
-  public md: MutableData | undefined;
-
   public tag = 0xDEC1;
 
-  public depth: number = 0;
-  public outputs: Array<[Buffer, number]> = [];
+  public depth: number | undefined;
+  public outputs: Array<[Buffer, number]> | undefined;
 
   public coin: string | undefined;
 
@@ -28,6 +27,9 @@ export default class Transaction extends Md {
    */
   public async setupGenesis(outputs: Array<[Buffer, number]>, coin: string) {
     this.outputs = outputs;
+
+    this.depth = 0;
+
     this.coin = coin;
 
     this.xor = await this.app.crypto.sha3Hash('genesis-' + this.coin);
@@ -41,9 +43,11 @@ export default class Transaction extends Md {
    * @param sk
    */
   public async setup(outputs: Array<[Buffer, number]>, parent: Transaction, sk: Buffer) {
-    this.depth = parent.depth + 1;
-    this.parent = parent;
     this.outputs = outputs;
+
+    this.depth = parent.depth! + 1;
+
+    this.parent = parent;
     this.signature = await parent.sign(sk);
     this.publicKey = await getPublicKey(sk);
 
@@ -51,13 +55,18 @@ export default class Transaction extends Md {
   }
 
   public async commit() {
-    this.md = await this.app.mutableData.newPublic(this.xor, this.tag);
-
     const entries = await this.app.mutableData.newEntries();
-    const pm = await this.app.mutableData.newPermissions();
+
+    if (this.depth === undefined) {
+      throw Error('depth is undefined');
+    }
+
+    if (this.outputs === undefined) {
+      throw Error('outputs is undefined');
+    }
 
     await entries.insert('depth', this.depth.toString());
-    await entries.insert('outputs', JSON.stringify(this.outputs.map((o) => {
+    await entries.insert('outputs', JSON.stringify(this.outputs!.map((o) => {
       return [ [...o[0]], o[1] ];
     })));
 
@@ -69,23 +78,26 @@ export default class Transaction extends Md {
       await entries.insert('public_key', this.publicKey!);
     }
 
-    await this.md.put(pm, entries);
+    // Put the entries at an MD without permissions.
+    const md = await this.app.mutableData.newPublic(this.xor, this.tag);
+    const pm = await this.app.mutableData.newPermissions();
+    await md.put(pm, entries);
   }
 
   public async fetch() {
-    this.md = await this.app.mutableData.newPublic(this.xor, this.tag);
+    const md = await this.app.mutableData.newPublic(this.xor, this.tag);
 
-    const depthVv = await this.md.get('depth');
+    const depthVv = await md.get('depth');
     this.depth = Number(depthVv.buf.toString());
 
-    const outputsVv = await this.md.get('outputs');
+    const outputsVv = await md.get('outputs');
     this.outputs = JSON.parse(
       outputsVv.buf.toString()).map((o: Array<[ number[], number ]>) => [ Buffer.from(o[0]), o[1] ],
     );
 
     let coinVv: ValueVersion | undefined;
     try {
-      coinVv = await this.md.get('coin');
+      coinVv = await md.get('coin');
     } catch (e) {
       if (e.code !== error_const.ERR_NO_SUCH_ENTRY.code) {
         throw e;
@@ -95,14 +107,26 @@ export default class Transaction extends Md {
     if (coinVv !== undefined) {
       this.coin = coinVv.buf.toString();
     } else {
-      const parentVv = await this.md.get('parent');
+      const parentVv = await md.get('parent');
       this.parent = new Transaction(this.app, parentVv.buf);
 
-      const signatureVv = await this.md.get('signature');
+      const signatureVv = await md.get('signature');
       this.signature = signatureVv.buf;
 
-      const publicKeyVv = await this.md.get('public_key');
+      const publicKeyVv = await md.get('public_key');
       this.publicKey = publicKeyVv.buf;
+    }
+  }
+
+  public async verify() {
+    let transaction: Transaction = this;
+
+    while (true) {
+      await transaction.fetch();
+
+      // transaction.outputs;
+
+      transaction = transaction.parent!;
     }
   }
 
