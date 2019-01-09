@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@maidsafe/safe-node-app": "maidsafe/safe_app_nodejs.git#semver:^0.10.0",
+    "js-sha3": "^0.8.0",
     "libsodium-wrappers-sumo": "^0.7.3",
     "node-ipc": "^9.1.1",
     "rdflib": "^0.19.1",

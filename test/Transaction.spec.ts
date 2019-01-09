@@ -3,9 +3,10 @@ import * as h from './helpers';
 import * as utils from '../src/utils';
 
 import Decorum from '../src/Decorum';
-import Transaction from '../src/Transaction';
+import GenesisTransaction from '../src/token/GenesisTransaction';
 
 import crypto from 'crypto';
+import TransactionBuilder from '../src/token/TransactionBuilder';
 
 describe('Transaction', () => {
   let app: Decorum;
@@ -14,44 +15,15 @@ describe('Transaction', () => {
     app = new Decorum(await h.get_app());
   });
 
-  it('create genesis transaction', async () => {
-    const coin = crypto.randomBytes(20).toString('hex');
-
-    const outputs: Array<[Buffer, number]> = [
-      [Buffer.from('publickey'), 1000],
-    ];
-
-    const t = new Transaction(app.app);
-    await t.setupGenesis(outputs, coin);
-    await t.commit();
-
-    const u = new Transaction(app.app, Buffer.from(t.xor));
-    await u.fetch();
-
-    assert.equal(u.coin, coin);
-    assert.equal(u.depth, 0);
-    assert.deepEqual(u.outputs, outputs);
-  });
-
-  it('create consecutive transaction', async () => {
+  it('create genesis and child transaction', async () => {
     const [sk, pk] = await utils.generateKeyPair();
-
     const coin = crypto.randomBytes(20).toString('hex');
 
-    const outputs: Array<[Buffer, number]> = [
-      [pk, 1000],
-    ];
+    const gt = new GenesisTransaction(app.app, coin, [[pk, 1000]]);
+    await gt.commit();
 
-    const t = new Transaction(app.app);
-    await t.setupGenesis(outputs, coin);
+    const tb = await TransactionBuilder.fromParent(gt, sk);
+    const t = tb.build(app.app);
     await t.commit();
-
-    const u = new Transaction(app.app);
-    await u.setup(
-      [ [ pk, 1000 ] ],
-      t,
-      sk,
-    );
-    await u.commit();
   });
 });
