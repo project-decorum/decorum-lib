@@ -22,8 +22,7 @@ describe('Transaction', () => {
     const gt = new GenesisTransaction(app.app, coin, [[pk, 1000]]);
     await gt.commit();
 
-    const tb = await TransactionBuilder.fromParent(gt, sk);
-    const t = tb.build(app.app);
+    const t = await gt.spend(sk, [[pk, 1000]]);
     await t.commit();
   });
 });

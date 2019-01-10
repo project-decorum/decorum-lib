@@ -25,6 +25,9 @@ export default abstract class AbstractTransaction extends Md {
     this.outputs = outputs;
   }
 
+  /**
+   * Create an Entries instance with the properties from this class.
+   */
   public async createEntries() {
     const entries = await this.app.mutableData.newEntries();
 
@@ -56,28 +59,6 @@ export default abstract class AbstractTransaction extends Md {
     );
 
     return md;
-
-    // let coinVv: ValueVersion | undefined;
-    // try {
-    //   coinVv = await md.get('coin');
-    // } catch (e) {
-    //   if (e.code !== error_const.ERR_NO_SUCH_ENTRY.code) {
-    //     throw e;
-    //   }
-    // }
-
-    // if (coinVv !== undefined) {
-    //   this.coin = coinVv.buf.toString();
-    // } else {
-    //   const parentVv = await md.get('parent');
-    //   this.parent = new Transaction(this.app, parentVv.buf);
-
-    //   const signatureVv = await md.get('signature');
-    //   this.signature = signatureVv.buf;
-
-    //   const publicKeyVv = await md.get('public_key');
-    //   this.publicKey = publicKeyVv.buf;
-    // }
   }
 
   /**

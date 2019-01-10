@@ -48,8 +48,7 @@ export default class TransactionBuilder {
       this.outputs,
       this.signature,
       this.publicKey,
-      this.parentSerial,
-      this.parent,
+      this.parent ? this.parent : this.parentSerial,
     );
   }
 }

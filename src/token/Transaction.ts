@@ -12,8 +12,10 @@ export default class Transaction extends AbstractTransaction {
   public signature: Buffer;
   public publicKey: Buffer;
 
-  public parentSerial: Buffer;
-  public parent: AbstractTransaction | undefined;
+  /**
+   * Either the parent transaction or the serial.
+   */
+  public parent: AbstractTransaction | Buffer;
 
 
   constructor(
@@ -22,15 +24,13 @@ export default class Transaction extends AbstractTransaction {
     outputs: Array<[Buffer, number]>,
     signature: Buffer,
     publicKey: Buffer,
-    parentSerial: Buffer,
-    parent?: AbstractTransaction,
+    parent: AbstractTransaction | Buffer,
   ) {
     const xor = Buffer.from(sha3_256.arrayBuffer(signature));
     super(app, xor, depth, outputs);
 
     this.signature = signature;
     this.publicKey = publicKey;
-    this.parentSerial = parentSerial;
     this.parent = parent;
   }
 
@@ -38,13 +38,20 @@ export default class Transaction extends AbstractTransaction {
   public async createEntries() {
     const entries = await super.createEntries();
 
-    await entries.insert('parent', this.parentSerial);
+    await entries.insert('parent', this.parent instanceof Buffer ? this.parent : this.parent.xor);
     await entries.insert('signature', this.signature);
     await entries.insert('public_key', this.publicKey);
 
     return entries;
   }
 
+
+  public async spend(sk: Buffer, outputs: Array<[Buffer, number]> = []) {
+    const signature = await this.sign(sk);
+    const pk = await getPublicKey(sk);
+
+    return new Transaction(this.app, this.depth + 1, outputs, signature, pk, this);
+  }
 
   // /**
   //  * Setup the properties for a regular transaction.
