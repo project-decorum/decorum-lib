@@ -39,6 +39,10 @@ export default abstract class AbstractTransaction extends Md {
     return entries;
   }
 
+  /**
+   * PUT a Permissions-less MD to the network with the entries returned by
+   * createEntries().
+   */
   public async commit() {
     // Put the entries at an MD without permissions.
     const md = await this.app.mutableData.newPublic(this.xor, this.tag);
@@ -47,6 +51,9 @@ export default abstract class AbstractTransaction extends Md {
     await md.put(pm, entries);
   }
 
+  /**
+   * Fetch the MD from the network and process the properties.
+   */
   public async fetch() {
     const md = await this.app.mutableData.newPublic(this.xor, this.tag);
 

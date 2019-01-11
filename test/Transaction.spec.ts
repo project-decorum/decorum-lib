@@ -6,7 +6,6 @@ import Decorum from '../src/Decorum';
 import GenesisTransaction from '../src/token/GenesisTransaction';
 
 import crypto from 'crypto';
-import TransactionBuilder from '../src/token/TransactionBuilder';
 
 describe('Transaction', () => {
   let app: Decorum;
