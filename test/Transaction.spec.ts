@@ -6,6 +6,7 @@ import Decorum from '../src/Decorum';
 import GenesisTransaction from '../src/token/GenesisTransaction';
 
 import crypto from 'crypto';
+import Transaction from '../src/token/Transaction';
 
 describe('Transaction', () => {
   let app: Decorum;
@@ -23,5 +24,10 @@ describe('Transaction', () => {
 
     const t = await gt.spend(sk, [[pk, 1000]]);
     await t.commit();
+
+    const md = await app.app.mutableData.newPublic(t.xor, t.tag);
+    const { buf: signature } = await md.get('signature');
+
+    assert.deepEqual(t.signature, signature);
   });
 });
