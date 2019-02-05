@@ -18,8 +18,8 @@ export default abstract class AbstractTransaction extends Md {
   public outputs: Array<[Buffer, number]>;
 
 
-  constructor(app: SAFEApp, xor: Buffer, depth: number, outputs: Array<[Buffer, number]>) {
-    super(app, xor);
+  constructor(xor: Buffer, depth: number, outputs: Array<[Buffer, number]>) {
+    super(xor);
 
     this.depth = depth;
     this.outputs = outputs;
@@ -28,8 +28,8 @@ export default abstract class AbstractTransaction extends Md {
   /**
    * Create an Entries instance with the properties from this class.
    */
-  public async createEntries() {
-    const entries = await this.app.mutableData.newEntries();
+  public async createEntries(app: SAFEApp) {
+    const entries = await app.mutableData.newEntries();
 
     await entries.insert('depth', this.depth.toString());
     await entries.insert('outputs', JSON.stringify(this.outputs.map((o) => {
@@ -43,19 +43,19 @@ export default abstract class AbstractTransaction extends Md {
    * PUT a Permissions-less MD to the network with the entries returned by
    * createEntries().
    */
-  public async commit() {
+  public async commit(app: SAFEApp) {
     // Put the entries at an MD without permissions.
-    const md = await this.app.mutableData.newPublic(this.xor, this.tag);
-    const pm = await this.app.mutableData.newPermissions();
-    const entries = await this.createEntries();
+    const md = await app.mutableData.newPublic(this.xor, this.tag);
+    const pm = await app.mutableData.newPermissions();
+    const entries = await this.createEntries(app);
     await md.put(pm, entries);
   }
 
   /**
    * Fetch the MD from the network and process the properties.
    */
-  public async fetch() {
-    const md = await this.app.mutableData.newPublic(this.xor, this.tag);
+  public async fetch(app: SAFEApp) {
+    const md = await app.mutableData.newPublic(this.xor, this.tag);
 
     const depthVv = await md.get('depth');
     this.depth = Number(depthVv.buf.toString());

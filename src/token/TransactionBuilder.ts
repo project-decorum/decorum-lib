@@ -41,9 +41,8 @@ export default class TransactionBuilder {
     return this;
   }
 
-  public build(app: SAFEApp) {
+  public build() {
     return new Transaction(
-      app,
       this.depth,
       this.outputs,
       this.signature,

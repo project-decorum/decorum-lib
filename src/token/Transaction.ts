@@ -19,7 +19,6 @@ export default class Transaction extends AbstractTransaction {
 
 
   constructor(
-    app: SAFEApp,
     depth: number,
     outputs: Array<[Buffer, number]>,
     signature: Buffer,
@@ -27,7 +26,7 @@ export default class Transaction extends AbstractTransaction {
     parent: AbstractTransaction | Buffer,
   ) {
     const xor = Buffer.from(sha3_256.arrayBuffer(signature));
-    super(app, xor, depth, outputs);
+    super(xor, depth, outputs);
 
     this.signature = signature;
     this.publicKey = publicKey;
@@ -35,8 +34,8 @@ export default class Transaction extends AbstractTransaction {
   }
 
 
-  public async createEntries() {
-    const entries = await super.createEntries();
+  public async createEntries(app: SAFEApp) {
+    const entries = await super.createEntries(app);
 
     await entries.insert('parent', this.parent instanceof Buffer ? this.parent : this.parent.xor);
     await entries.insert('signature', this.signature);
@@ -50,7 +49,7 @@ export default class Transaction extends AbstractTransaction {
     const signature = await this.sign(sk);
     const pk = await getPublicKey(sk);
 
-    return new Transaction(this.app, this.depth + 1, outputs, signature, pk, this);
+    return new Transaction(this.depth + 1, outputs, signature, pk, this);
   }
 
   // /**

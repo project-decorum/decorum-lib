@@ -16,7 +16,7 @@ export default class GenesisTransactionBuilder {
     return this;
   }
 
-  public build(app: SAFEApp) {
-    return new GenesisTransaction(app, this.coin, this.outputs);
+  public build() {
+    return new GenesisTransaction(this.coin, this.outputs);
   }
 }

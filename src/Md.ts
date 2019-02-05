@@ -20,17 +20,13 @@ export default class Md {
   public tag: number;
 
 
-  protected app: SAFEApp;
-
-  constructor(app: SAFEApp, xor?: Buffer, tag?: number) {
-    this.app = app;
-
+  constructor(xor?: Buffer, tag?: number) {
     this.xor = xor || crypto.randomBytes(32);
     this.tag = tag || 0;
   }
 
-  public async commit() {
-    //
+  public async commit(app: SAFEApp) {
+    throw new Error('unimplemented');
   }
 
   /**
