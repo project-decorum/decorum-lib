@@ -1,3 +1,7 @@
+import CID from 'cids';
+import consts from '@maidsafe/safe-node-app/src/consts';
+import multihashes from 'multihashes';
+import url from 'url';
 import sodium from 'libsodium-wrappers-sumo';
 
 /**
@@ -38,4 +42,40 @@ export async function generateSymmetric() {
   await sodium.ready;
 
   return Buffer.from(sodium.randombytes_buf(32).buffer);
+}
+
+/**
+ * Turn a mutable or immutable data address into an XOR URL.
+ *
+ * @param xor Name of mutable of immutable data.
+ * @param [tag] Optionally the tag type if mutable data.
+ * @returns An XOR URL.
+ */
+export function get_xor_url(xor: Buffer, tag?: number) {
+  const encodedHash = multihashes.encode(xor, consts.CID_HASH_FN);
+  const newCid = new CID(consts.CID_VERSION, consts.CID_DEFAULT_CODEC, encodedHash);
+  const cidStr = newCid.toBaseEncodedString(consts.CID_BASE_ENCODING);
+
+  return tag
+    ? `safe://${cidStr}:${tag}`
+    : `safe://${cidStr}`;
+}
+
+/**
+ * Parse an XOR URL into its parts.
+ *
+ * @param safeUrl The XOR URL (e.g. safe://<cid>:<tag>).
+ * @returns The extracted components of the XOR URL.
+ */
+export function parse_xor_url(safeUrl: string) {
+  const urlObject = url.parse(safeUrl);
+
+  const cid = new CID(urlObject.hostname);
+  const encodedHash = multihashes.decode(cid.multihash);
+  const address = encodedHash.digest;
+
+  return {
+    xor: encodedHash.digest as Buffer,
+    tag: urlObject.port === undefined ? undefined : Number(urlObject.port),
+  };
 }

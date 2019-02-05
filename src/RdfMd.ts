@@ -10,7 +10,7 @@ import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 export default class RdfMd extends Md {
   public graph: any = rdflib.graph();
 
-  public async commit(app: SAFEApp) {
+  public async put(app: SAFEApp) {
     const md = await app.mutableData.newPublic(this.xor, this.tag);
 
     const perms = await app.mutableData.newPermissions();
@@ -26,7 +26,7 @@ export default class RdfMd extends Md {
     await rdf.commit();
   }
 
-  public async update(app: SAFEApp) {
+  public async commit(app: SAFEApp) {
     const md = await app.mutableData.newPublic(this.xor, this.tag);
 
     const rdf = md.emulateAs('RDF');

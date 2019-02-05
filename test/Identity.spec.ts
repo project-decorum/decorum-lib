@@ -13,10 +13,9 @@ describe('Decorum', () => {
 
   it('fetches a committed WebID', async () => {
     const identity = new Identity('John Doe');
-    await identity.commit(app);
+    await identity.put(app);
 
-    const identity2 = new Identity('', undefined, undefined, identity.xor);
-    await identity2.fetch(app);
+    const identity2 = await Identity.fromXor(app, identity.xor, identity.tag);
 
     assert.equal(identity.name, identity2.name);
   });
@@ -24,13 +23,12 @@ describe('Decorum', () => {
   it('update an existing WebID', async () => {
     // Create new John.
     const identity = new Identity('John Doe');
-    await identity.commit(app);
+    await identity.put(app);
 
     // Fetch John and change to Isaac.
-    const identity2 = new Identity('', undefined, undefined, identity.xor);
-    await identity2.fetch(app);
+    const identity2 = await Identity.fromXor(app, identity.xor, identity.tag);
     identity2.name = 'Isaac Newton';
-    await identity2.update(app);
+    await identity2.commit(app);
 
     // Fetch John from network, should be Isaac now.
     await identity.fetch(app);
@@ -40,29 +38,22 @@ describe('Decorum', () => {
 
   it('create "knows" relationship between WebIDs', async () => {
     const john = new Identity('John Doe');
-    await john.commit(app);
+    await john.put(app);
 
     const isaac = new Identity('Isaac Newton');
     isaac.addKnows(john);
-    await isaac.commit(app);
+    await isaac.put(app);
 
-    const shouldBeJohn = new Identity('');
-    shouldBeJohn.url = isaac.knows[0];
-    await shouldBeJohn.fetch(app);
+    const shouldBeJohn = await Identity.fromXorUrl(app, isaac.knows[0]);
 
     assert.equal(john.name, shouldBeJohn.name);
   });
 
-  it('instantiates Identity from graph', async () => {
+  it('instantiates Identity from XOR URL', async () => {
     const john = new Identity('John Doe');
-    await john.commit(app);
+    await john.put(app);
 
-    const md = await app.mutableData.newPublic(john.xor, john.tag);
-
-    const rdf = md.emulateAs('RDF');
-    await rdf.nowOrWhenFetched();
-
-    const identity = Identity.fromGraph(rdf.graphStore);
+    const identity = await Identity.fromXorUrl(app, john.url);
 
     assert.equal(john.name, identity.name);
   });
