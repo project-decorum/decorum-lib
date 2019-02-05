@@ -1,1 +1,1 @@
-export { default } from './Decorum';
+export { default as Identity } from './Identity';

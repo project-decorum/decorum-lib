@@ -4,7 +4,7 @@ import * as h from './helpers';
 import Identity from '../src/Identity';
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 
-describe('Decorum', () => {
+describe('Identity', () => {
   let app: SAFEApp;
 
   before(async () => {
