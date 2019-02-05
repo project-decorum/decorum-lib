@@ -52,4 +52,18 @@ describe('Decorum', () => {
 
     assert.equal(john.name, shouldBeJohn.name);
   });
+
+  it('instantiates Identity from graph', async () => {
+    const john = new Identity('John Doe');
+    await john.commit(app);
+
+    const md = await app.mutableData.newPublic(john.xor, john.tag);
+
+    const rdf = md.emulateAs('RDF');
+    await rdf.nowOrWhenFetched();
+
+    const identity = Identity.fromGraph(rdf.graphStore);
+
+    assert.equal(john.name, identity.name);
+  });
 });

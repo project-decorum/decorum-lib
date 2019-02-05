@@ -77,4 +77,36 @@ export default class Identity extends RdfMd {
 
     return graph;
   }
+
+  public static fromGraph(graph: any) {
+    const FOAF = rdflib.Namespace('https://xmlns.com/foaf/0.1/');
+    const RDF = rdflib.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+
+    let url = graph.any(null, RDF('type'), FOAF('PersonalProfileDocument'));
+    if (url === undefined) {
+      throw new Error('WebID must have `type` of `PersonalProfileDocument`');
+    }
+    url = url.value;
+
+    let name = graph.any(rdflib.sym(url + '#me'), FOAF('name'), null);
+    if (name === undefined) {
+      throw new Error('WebID must have a `name`');
+    }
+    name = name.value;
+
+    let nick = graph.any(rdflib.sym(url + '#me'), FOAF('nick'), null);
+    nick = nick ? nick.value : undefined;
+
+    const knows: string[] = [];
+
+    const matches = graph.match(rdflib.sym(url + '#me'), FOAF('knows'), null);
+    for (const { object } of matches) {
+      knows.push(object.value);
+    }
+
+    const identity = new this(name, nick, knows);
+    identity.url = url;
+
+    return identity;
+  }
 }
