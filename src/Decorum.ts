@@ -21,6 +21,6 @@ export default class Decorum {
    * @returns The Identity
    */
   public newIdentity(xor?: Buffer) {
-    return new Identity(this.app, xor);
+    return new Identity('', undefined, undefined, xor);
   }
 }
