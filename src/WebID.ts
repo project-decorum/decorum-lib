@@ -5,7 +5,7 @@ import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 import { parse_xor_url } from './utils';
 
 
-export default class Identity extends RdfMd {
+export default class WebId extends RdfMd {
   public tag = 0xDEC0;
 
   public name: string;

@@ -1,1 +1,1 @@
-export { default as Identity } from './Identity';
+export { default as WebId } from './WebID';
