@@ -23,7 +23,7 @@ const PERMISSIONS =  {
  */
 export async function get_app() {
   const app = await Safe.initialiseApp(INFO, undefined, { enableExperimentalApis: true});
-  await app.auth.loginForTest(PERMISSIONS);
+  await app.auth.loginForTest(PERMISSIONS, { own_container: true });
 
   return app;
 }
