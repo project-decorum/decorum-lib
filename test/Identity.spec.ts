@@ -36,7 +36,7 @@ describe('Identity manager', () => {
       const md = await app.mutableData.fromSerial(this.serial);
 
       const entries = await md.getEntries();
-      const entries_arr: Array<{ key: Uint8Array, value: ValueVersion }> = await entries.listEntries();
+      const entries_arr: Array<{ key: Buffer, value: ValueVersion }> = await entries.listEntries();
 
       const map = [...this.webIds.entries()];
 
@@ -97,7 +97,7 @@ describe('Identity manager', () => {
       const serial = await md.serialise();
 
       const entries = await md.getEntries();
-      const entries_arr: Array<{ key: Uint8Array, value: ValueVersion }> = await entries.listEntries();
+      const entries_arr: Array<{ key: Buffer, value: ValueVersion }> = await entries.listEntries();
 
       let map = entries_arr.map(e => <[Buffer, Buffer]>[e.key, e.value.buf]);
           map = map.filter(([k, v]) => v.length > 0);
@@ -141,16 +141,5 @@ describe('Identity manager', () => {
 
       console.log(c.webIds);
     }
-  });
-
-  it.only('does other things', async () => {
-    const md = await app.auth.getOwnContainer();
-
-    const nat = await md.getNameAndTag();
-
-
-    const f = await app.webFetch(nat.xorUrl);
-
-    console.log(f);
   });
 });
