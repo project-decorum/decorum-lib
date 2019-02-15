@@ -14,13 +14,13 @@ export default class AppContainer extends Md {
   /**
    * List of WebIDs.
    */
-  public webIds: Map<Buffer, Buffer>;
+  public webIds: EntriesMap<Buffer>;
 
-  constructor(xor: Buffer, tag: number, serial: string, webIds?: Map<Buffer, Buffer>) {
+  constructor(xor: Buffer, tag: number, serial: string, webIds?: EntriesMap<Buffer>) {
     super(xor, tag);
 
     this.serial = serial;
-    this.webIds = webIds || new Map();
+    this.webIds = webIds || new EntriesMap();
   }
 
   public async commit(app: SAFEApp) {
@@ -34,11 +34,6 @@ export default class AppContainer extends Md {
 
   public async add(wid: WebId) {
     const [key, value] = [Buffer.from(wid.url), Buffer.from(wid.url)];
-
-    // If the same Buffer content is already in the Map: do not add.
-    if ([...this.webIds].findIndex(([k,]) => k.equals(key)) !== -1) {
-      return;
-    }
 
     this.webIds.set(key, value);
   }
@@ -55,20 +50,20 @@ export default class AppContainer extends Md {
     let map = entries_arr.map(e => <[Buffer, Buffer]>[e.key, e.value.buf]);
     map = map.filter(([k, v]) => v.length > 0);
 
-    const ids: Map<Buffer, Buffer> = new Map(map);
+    const ids = new EntriesMap(map);
 
     return new this(nat.name, nat.typeTag, serial, ids);
   }
 }
 
 /**
- * Calculate differences between Entries and Map<Buffer, Buffer>.
+ * Calculate differences between Entries and EntriesMap<Buffer>.
  *
  * @param entries
  * @param entriesMap
  * @returns Mutation that will make Entries mirror the Map.
  */
-async function mutate_from_map(entries: Entries, entriesMap: Map<Buffer, Buffer>) {
+async function mutate_from_map(entries: Entries, entriesMap: EntriesMap<Buffer>) {
   const entries_arr = await entries.listEntries();
   const map_arr = [...entriesMap.entries()];
 
@@ -110,3 +105,65 @@ async function mutate_from_map(entries: Entries, entriesMap: Map<Buffer, Buffer>
 
   return mutation;
 }
+
+/**
+ * A Map implementation that will not duplicate equal Buffers:
+ *
+ * ```
+ * let map;
+ *
+ * map = new Map();
+ * map.set(Buffer.from('a'), 'a0');
+ * map.set(Buffer.from('a'), 'a1');
+ * console.log(map.size); // will yield '2'
+ *
+ * map = new EntriesMap();
+ * map.set(Buffer.from('a'), 'a0');
+ * map.set(Buffer.from('a'), 'a1');
+ * console.log(map.size); // will yield '1'
+ * ```
+ *
+ * @class EntriesMap
+ */
+class EntriesMap<T> extends Map<Buffer, T> {
+
+  public delete(key: Buffer | string) {
+    key = key instanceof Buffer ? key : Buffer.from(key);
+
+    const equal = this.find(key);
+    if (equal !== undefined) {
+      return super.delete(equal[0]);
+    }
+
+    return false;
+  }
+
+  public get(key: Buffer | string) {
+    const equal = this.find(key);
+    return equal === undefined ? undefined : equal[1];
+  }
+
+  public has(key: Buffer | string) {
+    return this.find(key) ? true : false;
+  }
+
+  public set(key: Buffer | string, value: T) {
+    key = key instanceof Buffer ? key : Buffer.from(key);
+
+    const equal = this.find(key);
+    if (equal !== undefined) {
+      key = equal[0];
+    }
+
+    super.set(key, value);
+
+    return this;
+  }
+
+  private find(key: Buffer | string) {
+    const keyBuf = key instanceof Buffer ? key : Buffer.from(key);
+
+    return Array.from(this).find(([k, v]) => k.equals(keyBuf));
+  }
+}
+
