@@ -1,5 +1,5 @@
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
-import { MutableData, ValueVersion } from '@maidsafe/safe-node-app/src/api/mutable';
+import { MutableData, Entries } from '@maidsafe/safe-node-app/src/api/mutable';
 import error_const from '@maidsafe/safe-node-app/src/error_const';
 
 import Md from '../src/Md';
@@ -27,45 +27,7 @@ export default class AppContainer extends Md {
     const md = await app.mutableData.fromSerial(this.serial);
 
     const entries = await md.getEntries();
-    const entries_arr: Array<{ key: Buffer, value: ValueVersion }> = await entries.listEntries();
-
-    const map = [...this.webIds.entries()];
-
-    const mutation = await entries.mutate();
-
-    for (const { key: mdKey, value: mdValue } of entries_arr) {
-      const index = map.findIndex(([key,]) => key.equals(mdKey));
-
-      // If map does not have this key.
-      if (index === -1) {
-        // If entry is not already deleted.
-        if (mdValue.buf.length > 0) {
-          // DELETE.
-          await mutation.delete(mdKey, mdValue.version + 1);
-        }
-
-        continue;
-      }
-
-      // If map value is different from entry.
-      if (!mdValue.buf.equals(map[index][1])) {
-        // UPDATE
-        await mutation.update(mdKey, mdValue.buf, mdValue.version + 1);
-      }
-
-      // Map has entry and value is equal. Do nothing.
-    }
-
-    for (const [key, value] of map) {
-      const index = entries_arr.findIndex(({ key: mdKey }) => key.equals(mdKey));
-
-      // If MD does not have this key.
-      if (index === -1) {
-        // INSERT
-        console.log('insert');
-        await mutation.insert(key, value);
-      }
-    }
+    const mutation = await mutate_from_map(entries, this.webIds);
 
     await md.applyEntriesMutation(mutation);
   }
@@ -74,7 +36,7 @@ export default class AppContainer extends Md {
     const [key, value] = [Buffer.from(wid.url), Buffer.from(wid.url)];
 
     // If the same Buffer content is already in the Map: do not add.
-    if ([...this.webIds].findIndex(([k,]) => k.equals(key))) {
+    if ([...this.webIds].findIndex(([k,]) => k.equals(key)) !== -1) {
       return;
     }
 
@@ -97,4 +59,54 @@ export default class AppContainer extends Md {
 
     return new this(nat.name, nat.typeTag, serial, ids);
   }
+}
+
+/**
+ * Calculate differences between Entries and Map<Buffer, Buffer>.
+ *
+ * @param entries
+ * @param entriesMap
+ * @returns Mutation that will make Entries mirror the Map.
+ */
+async function mutate_from_map(entries: Entries, entriesMap: Map<Buffer, Buffer>) {
+  const entries_arr = await entries.listEntries();
+  const map_arr = [...entriesMap.entries()];
+
+  const mutation = await entries.mutate();
+
+  for (const { key: mdKey, value: mdValue } of entries_arr) {
+    const index = map_arr.findIndex(([key,]) => key.equals(mdKey));
+
+    // If map does not have this key.
+    if (index === -1) {
+      // If entry is not already deleted.
+      if (mdValue.buf.length > 0) {
+        // DELETE.
+        await mutation.delete(mdKey, mdValue.version + 1);
+      }
+
+      continue;
+    }
+
+    // If map value is different from entry.
+    if (!mdValue.buf.equals(map_arr[index][1])) {
+      // UPDATE
+      await mutation.update(mdKey, map_arr[index][1], mdValue.version + 1);
+    }
+
+    // Map has entry and value is equal. Do nothing.
+  }
+
+  for (const [key, value] of map_arr) {
+    const index = entries_arr.findIndex(({ key: mdKey }) => key.equals(mdKey));
+
+
+    // If MD does not have this key.
+    if (index === -1) {
+      // INSERT
+      await mutation.insert(key, value);
+    }
+  }
+
+  return mutation;
 }
