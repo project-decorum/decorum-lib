@@ -14,9 +14,9 @@ export default class AppContainer extends Md {
   /**
    * List of WebIDs.
    */
-  public webIds: EntriesMap<Buffer>;
+  public webIds: EntriesMap;
 
-  constructor(xor: Buffer, tag: number, serial: string, webIds?: EntriesMap<Buffer>) {
+  constructor(xor: Buffer, tag: number, serial: string, webIds?: EntriesMap) {
     super(xor, tag);
 
     this.serial = serial;
@@ -29,7 +29,9 @@ export default class AppContainer extends Md {
     const entries = await md.getEntries();
     const mutation = await mutate_from_map(entries, this.webIds);
 
-    await md.applyEntriesMutation(mutation);
+    if (mutation !== undefined) {
+      await md.applyEntriesMutation(mutation);
+    }
   }
 
   public async add(wid: WebId) {
@@ -45,29 +47,25 @@ export default class AppContainer extends Md {
     const serial = await md.serialise();
 
     const entries = await md.getEntries();
-    const entries_arr = await entries.listEntries();
-
-    let map = entries_arr.map(e => <[Buffer, Buffer]>[e.key, e.value.buf]);
-    map = map.filter(([k, v]) => v.length > 0);
-
-    const ids = new EntriesMap(map);
+    const ids = await EntriesMap.from(entries);
 
     return new this(nat.name, nat.typeTag, serial, ids);
   }
 }
 
 /**
- * Calculate differences between Entries and EntriesMap<Buffer>.
+ * Calculate differences between Entries and Map<Buffer, Buffer>.
  *
  * @param entries
  * @param entriesMap
  * @returns Mutation that will make Entries mirror the Map.
  */
-async function mutate_from_map(entries: Entries, entriesMap: EntriesMap<Buffer>) {
+async function mutate_from_map(entries: Entries, entriesMap: Map<Buffer, Buffer>) {
   const entries_arr = await entries.listEntries();
   const map_arr = [...entriesMap.entries()];
 
   const mutation = await entries.mutate();
+  let mutated = false;
 
   for (const { key: mdKey, value: mdValue } of entries_arr) {
     const index = map_arr.findIndex(([key,]) => key.equals(mdKey));
@@ -78,6 +76,7 @@ async function mutate_from_map(entries: Entries, entriesMap: EntriesMap<Buffer>)
       if (mdValue.buf.length > 0) {
         // DELETE.
         await mutation.delete(mdKey, mdValue.version + 1);
+        mutated = true;
       }
 
       continue;
@@ -87,6 +86,7 @@ async function mutate_from_map(entries: Entries, entriesMap: EntriesMap<Buffer>)
     if (!mdValue.buf.equals(map_arr[index][1])) {
       // UPDATE
       await mutation.update(mdKey, map_arr[index][1], mdValue.version + 1);
+      mutated = true;
     }
 
     // Map has entry and value is equal. Do nothing.
@@ -100,10 +100,11 @@ async function mutate_from_map(entries: Entries, entriesMap: EntriesMap<Buffer>)
     if (index === -1) {
       // INSERT
       await mutation.insert(key, value);
+      mutated = true;
     }
   }
 
-  return mutation;
+  return mutated ? mutation : undefined;
 }
 
 /**
@@ -125,8 +126,7 @@ async function mutate_from_map(entries: Entries, entriesMap: EntriesMap<Buffer>)
  *
  * @class EntriesMap
  */
-class EntriesMap<T> extends Map<Buffer, T> {
-
+class EntriesMap extends Map<Buffer, Buffer> {
   public delete(key: Buffer | string) {
     key = key instanceof Buffer ? key : Buffer.from(key);
 
@@ -147,8 +147,9 @@ class EntriesMap<T> extends Map<Buffer, T> {
     return this.find(key) ? true : false;
   }
 
-  public set(key: Buffer | string, value: T) {
+  public set(key: Buffer | string, value: Buffer | string) {
     key = key instanceof Buffer ? key : Buffer.from(key);
+    value = value instanceof Buffer ? value : Buffer.from(value);
 
     const equal = this.find(key);
     if (equal !== undefined) {
@@ -160,10 +161,22 @@ class EntriesMap<T> extends Map<Buffer, T> {
     return this;
   }
 
+  public static async from(entries: Entries) {
+    const entries_arr = await entries.listEntries();
+
+    let map = entries_arr.map(e => <[Buffer, Buffer]>[e.key, e.value.buf]);
+    map = map.filter(([k, v]) => v.length > 0);
+
+    return new this(map);
+  }
+
+  public async toMutation(entries: Entries) {
+    return await mutate_from_map(entries, this);
+  }
+
   private find(key: Buffer | string) {
     const keyBuf = key instanceof Buffer ? key : Buffer.from(key);
 
     return Array.from(this).find(([k, v]) => k.equals(keyBuf));
   }
 }
-
