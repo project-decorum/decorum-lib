@@ -3,13 +3,25 @@ import * as h from './helpers';
 
 import { SAFEApp } from '@maidsafe/safe-node-app/src/app';
 import AppContainer from '../src/AppContainer';
+import { WebId } from '../src';
 
 
 describe('Identity manager', () => {
   let app: SAFEApp;
 
-  before(async () => {
+  beforeEach(async () => {
     app = await h.get_app();
+  });
+
+  it('adds a WebID', async () => {
+    const md = await app.auth.getOwnContainer();
+    const c = await AppContainer.fromMd(md);
+
+    const wid = new WebId('John Doe');
+    await wid.put(app);
+
+    c.add(wid);
+    await c.commit(app);
   });
 
   // TODO: split up this test and separate from Identity tests

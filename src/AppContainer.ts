@@ -35,9 +35,7 @@ export default class AppContainer extends Md {
   }
 
   public async add(wid: WebId) {
-    const [key, value] = [Buffer.from(wid.url), Buffer.from(wid.url)];
-
-    this.webIds.set(key, value);
+    this.webIds.set(wid.url, wid.url);
   }
 
   public static async fromMd(md: MutableData) {
