@@ -16,26 +16,26 @@
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/maidsafe__safe-node-app": "github:project-decorum/maidsafe__safe-node-app",
+    "@types/maidsafe__safe-node-app": "github:project-decorum/maidsafe__safe-node-app#semver:^0.11.0",
     "@types/mocha": "^5.2.6",
     "@types/node-ipc": "^9.1.1",
     "chai": "^4.2.0",
-    "codecov": "^3.2.0",
+    "codecov": "^3.3.0",
     "cross-env": "^5.1.6",
     "mocha": "^6.0.0",
     "nyc": "^13.3.0",
     "source-map-support": "^0.5.11",
     "ts-node": "^8.0.3",
-    "tslint": "^5.14.0",
+    "tslint": "^5.15.0",
     "typedoc": "^0.14.0",
-    "typescript": "^3.3.4000"
+    "typescript": "^3.4.2"
   },
   "dependencies": {
-    "@maidsafe/safe-node-app": "^0.10.3",
+    "@maidsafe/safe-node-app": "^0.11.0",
     "js-sha3": "^0.8.0",
     "libsodium-wrappers-sumo": "^0.7.3",
     "node-ipc": "^9.1.1",
-    "rdflib": "^0.20.0"
+    "rdflib": "^0.20.1"
   },
   "files": [
     "dist"
