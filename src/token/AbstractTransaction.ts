@@ -62,7 +62,7 @@ export default abstract class AbstractTransaction extends Md {
 
     const outputsVv = await md.get('outputs');
     this.outputs = JSON.parse(
-      outputsVv.buf.toString()).map((o: Array<[number[], number]>) => [Buffer.from(o[0]), o[1]],
+      outputsVv.buf.toString()).map((o: [number[], number]) => [Buffer.from(o[0]), o[1]],
     );
 
     return md;

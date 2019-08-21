@@ -13,8 +13,8 @@ export async function generateKeyPair(): Promise<[Buffer, Buffer]> {
   const keyPair = sodium.crypto_sign_keypair();
 
   return [
-    new Buffer(keyPair.privateKey),
-    new Buffer(keyPair.publicKey),
+    Buffer.from(keyPair.privateKey),
+    Buffer.from(keyPair.publicKey),
   ];
 }
 
